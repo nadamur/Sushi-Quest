@@ -70,7 +70,6 @@ class Player(GameObjects):
             self.rect.y += self.speed
 
     def isHit(self):
-        
     
 
 
