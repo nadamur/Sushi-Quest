@@ -122,6 +122,45 @@ class Enemy(GameObjects):
         pass
 
 
+class Projectile(GameObjects):
+    def __init__(self, image_file, speed, position,damage):
+        super().__init__(image_file)
+        self.speed = speed
+        self.position = position
+        self.damage = damage
+
+    # Setters and Getters
+    def set_speed(self, speed):
+        self.speed = speed
+
+    def get_speed(self):
+        return self.speed
+
+    def set_position(self, position):
+        self.position = position
+
+    def get_position(self):
+        return self.position
+    
+    def set_damage(self, damage):
+        self.damage = damage
+    
+    def get_damage(self):
+        return self.damage
+
+    # Methods
+    def move(self):
+        # Add projectile movement logic here
+        pass
+
+    def hit(self):
+        # Add projectile hit logic here
+        pass
+
+    def die(self):
+        # Add projectile death logic here
+        pass
+
     
 
 
