@@ -58,6 +58,10 @@ class Actor(GameObjects):
     #Methods
 
     #Note to Neda: Feel free to change the move method to whatever you want. I just wanted to get something working.
+
+    
+    #to shirley from neda: hi yes im just gonna add double jumping as a movement that will require a boolean (unlocked) to be used
+    #side note: we probably need to run this in the main class under 'while running' since it has to be permanently happening
     def move(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
@@ -68,6 +72,7 @@ class Actor(GameObjects):
             self.rect.y -= self.speed
         if keys[pygame.K_DOWN]:
             self.rect.y += self.speed
+        
 
     #Note to Neda: We should have a skill method or a skill class for the double jump and everything? 
 
