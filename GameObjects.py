@@ -1,4 +1,4 @@
-import pygame
+import pygame, random, time, sys
 
 class GameObjects(pygame.sprite.Sprite):
     def __init__(self, image_file):
@@ -6,8 +6,8 @@ class GameObjects(pygame.sprite.Sprite):
         self.image = pygame.image.load(image_file).convert_alpha()
         self.rect = self.image.get_rect()
 
-class Player(GameObjects):
-    def __init__(self, image_file, name, health, skillLvl, costume, position, speed):
+class Actor(GameObjects):
+    def __init__(self, image_file, health, name, skillLvl, costume, position, speed):
         super().__init__(image_file)
         self.name = name
         self.health = health
@@ -69,7 +69,59 @@ class Player(GameObjects):
         if keys[pygame.K_DOWN]:
             self.rect.y += self.speed
 
-    def isHit(self):
+    #Note to Neda: We should have a skill method or a skill class for the double jump and everything? 
+
+    # Note to Shirley: Just a placeholder for now, can change later
+        # def isHit(self):
+        #     # check if the player is hit by something
+        #     if pygame.sprite.spritecollide(self, enemies_group, False):
+        #         self.health -= 10  # decrease health by 10 points
+        #         if self.health <= 0:
+        #             # player is dead, game over
+        #             game_over()
+
+
+class Enemy(GameObjects):
+    def __init__(self, image_file, health, speed, position):
+        super().__init__(image_file)
+        self.health = health
+        self.speed = speed
+        self.position = position
+
+    # Setters and Getters
+    def set_health(self, health):
+        self.health = health
+
+    def get_health(self):
+        return self.health
+
+    def set_speed(self, speed):
+        self.speed = speed
+
+    def get_speed(self):
+        return self.speed
+
+    def set_position(self, position):
+        self.position = position
+
+    def get_position(self):
+        return self.position
+
+    # Methods
+    def move(self):
+        # Add enemy movement logic here
+        pass
+
+    def hit(self):
+        self.health -= 10  # decrease health by 10 points
+        if self.health <= 0:
+            self.die()
+
+    def die(self):
+        # Add death animation and logic here
+        pass
+
+
     
 
 
