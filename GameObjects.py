@@ -97,15 +97,14 @@ class Actor(GameObjects):
                     v=5
                     m=1
 
+        #if double jump is unlocked
         if self.skillLvl>0:
             if isJump ==False and jumpCounter<=2:
                 if keys[pygame.K_SPACE]:
                    isJump = True
                    jumpCounter+=1
             if isJump:
-                #F is the force
                 F = (1/2)*m*(v**2)
-                #we need to properly clean up the Player class and position variable before this method can work
                 self.position.y -= F
                 v = v-1
                 if v<0:
@@ -113,7 +112,6 @@ class Actor(GameObjects):
                 if v==-6:
                     jumpCounter=0
                     isJump= False
-                    #reset
                     v=5
                     m=1
         pygame.time.delay(10)
