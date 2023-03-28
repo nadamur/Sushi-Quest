@@ -18,8 +18,8 @@ scale = 13
 ninja = pygame.image.load('groupproject-team-8/Sprites/ninja_hero_sprite.png')
 ninja = pygame.transform.scale(ninja, (ninja.get_width() / scale, ninja.get_height()/scale))
 
-rect = ninja.get_rect()
-rect.center = (x, y)
+ninja_rect = ninja.get_rect()
+ninja_rect.center = (x, y)
 
 # Game functions
 
@@ -37,7 +37,11 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-    
+
+    #basic movement
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        ninja
 
     pygame.display.update()
     #render
