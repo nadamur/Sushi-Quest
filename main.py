@@ -15,10 +15,10 @@ x = 200
 y = 200
 
 scale = 13
-img = pygame.image.load('sprites/ninja_hero_sprite.png')
-img = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))
+ninja = pygame.image.load('groupproject-team-8/Sprites/ninja_hero_sprite.png')
+ninja = pygame.transform.scale(ninja, (ninja.get_width() / scale, ninja.get_height()/scale))
 
-rect = img.get_rect()
+rect = ninja.get_rect()
 rect.center = (x, y)
 
 # Game functions
@@ -32,11 +32,12 @@ run = True
 # Game loop
 while run:
     #event loop
-    screen.blit(img, rect)
+    screen.blit(ninja, rect)
     #game logic
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+    
 
     pygame.display.update()
     #render
