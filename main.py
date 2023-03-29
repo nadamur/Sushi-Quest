@@ -23,9 +23,13 @@ def draw_bg():
 
 
 ninja = GameObjects.Ninja('ninja',200,200,13,7)
+star_group = pygame.sprite.Group()
 
 # Game functions
-
+def star_hit(self):
+    if ninja.alive:
+        ninja.health -= 5
+        self.kill()
 
 
 
@@ -40,7 +44,10 @@ while run:
     ninja.draw(screen)
     if ninja.alive:
         ninja.move(moving_left,moving_right)
-
+    #star collision logic
+    star_collisions = pygame.sprite.groupcollide(star_group,ninja,True,False)
+    for star in star_collisions:
+        star_hit()
     #game logic
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

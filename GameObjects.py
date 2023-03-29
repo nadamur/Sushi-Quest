@@ -9,15 +9,16 @@ class Ninja(pygame.sprite.Sprite):
         self.direction = 1
         self.vel_y = 0
         self.jump = False
-        self.mid_jump = True
         self.flip = False
         self.frame_index = 0
         self.action = 0
         self.health = 0
         self.max_health = self.health
+        self.jump_counter = 0
         self.update_time = pygame.time.get_ticks()
 
         img = pygame.image.load('groupproject-team-8/Sprites/ninja_hero_sprite.png')
+        health = pygame.image.load('groupproject-team-8/Sprites/temp_healthbar.jpg')
         self.image = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
@@ -48,10 +49,10 @@ class Ninja(pygame.sprite.Sprite):
             self.direction = 1
 
         #jumping
-        if self.jump == True and self.mid_jump == False:
+        if self.jump == True and self.jump_counter < 2:
             self.vel_y = -11
             self.jump = False
-            self.mid_jump = True
+            self.jump_counter +=1
 
         #gravity
         self.vel_y += 0.75
@@ -62,10 +63,28 @@ class Ninja(pygame.sprite.Sprite):
         #hit the floor
         if self.rect.bottom + dy > 622:
             dy = 622 - self.rect.bottom
-            self.mid_jump = False
+            self.jump_counter = 0
 
         self.rect.x += dx
         self.rect.y += dy
+
+
+
+class Star(pygame.sprite.Sprite):
+    def __init__(self, x,y,direction):
+        pygame.sprite.Sprite.__init__(self)
+        self.speed = 10
+        self.image = pygame.image.load('groupproject-team-8/Sprites/temp_star.jpg')
+        self.rect = self.image.get_rect()
+        self.rect.center = (x,y)
+        self.direction = direction
+
+    def update(self):
+        self.rect.x += (self.direction*self.speed)
+        #check if off screen, 800 is screen width
+        if self.rect.right < 0 or self.rect.left > 800:
+            self.kill()
+
 # class GameObjects(pygame.sprite.Sprite):
 #     def __init__(self,x,y,image):
 #         super().__init__()
