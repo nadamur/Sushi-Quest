@@ -10,16 +10,19 @@ SCREEN_HEIGHT = int(SCREEN_WIDTH * 0.8)
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('ninjagame')
+clock = pygame.time.Clock()
+FPS = 60
+moving_left = False
+moving_right = False
+BG = (144,201,100)
+red = (255,0,0)
 
-x = 200
-y = 200
+def draw_bg():
+    screen.fill(BG)
+    pygame.draw.line(screen,red,(0,600),(SCREEN_WIDTH,600))
 
-scale = 13
-ninja = pygame.image.load('groupproject-team-8/Sprites/ninja_hero_sprite.png')
-ninja = pygame.transform.scale(ninja, (ninja.get_width() / scale, ninja.get_height()/scale))
 
-ninja_rect = ninja.get_rect()
-ninja_rect.center = (x, y)
+ninja = GameObjects.Ninja('ninja',200,200,13,7)
 
 # Game functions
 
@@ -32,16 +35,31 @@ run = True
 # Game loop
 while run:
     #event loop
-    screen.blit(ninja, rect)
+    clock.tick(FPS)
+    draw_bg()
+    ninja.draw(screen)
+    if ninja.alive:
+        ninja.move(moving_left,moving_right)
+
     #game logic
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-
-    #basic movement
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        ninja
+        #keyboard press
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                moving_left = True
+            if event.key == pygame.K_RIGHT:
+                moving_right= True
+            if event.key == pygame.K_UP and ninja.alive:
+                ninja.jump = True
+        #keyboard release
+        if event.type == pygame.KEYUP:
+           if event.key == pygame.K_LEFT:
+               moving_left = False
+           if event.key == pygame.K_RIGHT:
+               moving_right= False       
+    
 
     pygame.display.update()
     #render

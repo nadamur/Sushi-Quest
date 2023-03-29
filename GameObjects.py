@@ -1,216 +1,304 @@
 import pygame, random, time, sys
 
-class GameObjects(pygame.sprite.Sprite):
-    def __init__(self, image_file):
-        super().__init__()
-        self.image = pygame.image.load(image_file).convert_alpha()
+class Ninja(pygame.sprite.Sprite):
+    def __init__(self, char_type,x, y, scale,speed):
+        pygame.sprite.Sprite.__init__(self)
+        self.alive = True
+        self.char_type = char_type
+        self.speed = speed
+        self.direction = 1
+        self.vel_y = 0
+        self.jump = False
+        self.mid_jump = True
+        self.flip = False
+        self.frame_index = 0
+        self.action = 0
+        self.health = 0
+        self.max_health = self.health
+        self.update_time = pygame.time.get_ticks()
+
+        img = pygame.image.load('groupproject-team-8/Sprites/ninja_hero_sprite.png')
+        self.image = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))
         self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
 
-class Actor(GameObjects):
-    def __init__(self, image_file, health, name, skillLvl, costume, position, speed):
-        super().__init__(image_file)
-        self.name = name
-        self.health = health
-        self.skillLvl = skillLvl
-        self.position = position
-        self.speed = speed
-        self.costume_images = {'Black': '', 'Blue': '', 'Red': ''} # Shirley: Add costume images
+    def update(self):
+        self.dead()
 
-    # Setters and Getters
+    def dead(self):
+        if self.health <=0:
+            self.health = 0
+            self.speed = 0
+            self.alive = False
 
-    def set_name(self, name):
-        self.name = name
-
-    def get_name(self):
-        return self.name
-
-    def set_health(self, health):
-        self.health = health
-
-    def get_health(self):
-        return self.health
-
-    def set_skillLvl(self, skillLvl):
-        self.skillLvl = skillLvl
-
-    def get_skillLvl(self):
-        return self.skillLvl
-
-    def set_costume(self, costume):
-        self.costume = costume
-        self.image = pygame.image.load(self.costume_images[costume]).convert_alpha()
-
-    def get_costume(self):
-        return self.costume
-
-    def set_position(self, position):
-        self.position = position
-
-    def get_position(self):
-        return self.position
-
-    def set_speed(self, speed):
-        self.speed = speed
-
-    def get_speed(self):
-        return self.speed
     
-    #Methods
+    def draw(self,screen):
+        screen.blit(pygame.transform.flip(self.image,self.flip,False),self.rect)
 
-    #Note to Neda: Feel free to change the move method to whatever you want. I just wanted to get something working.
-
-
-    #side note: we probably need to run this in the main class under 'while running' since it has to be permanently happening
-    
-    def move(self):
-        #will keep track of whether the player is currently mid-air
-        isJump = False
-        #v is the velocity of the jump
-        v = 5
-        #m is just for the sake of keeping track of gravity
-        m = 1
-        #self explanatory
-        jumpCounter = 0
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            self.rect.x -= self.speed
-        if keys[pygame.K_RIGHT]:
-            self.rect.x += self.speed
+    def move(self, moving_left,moving_right):
+        dx = 0
+        dy = 0
+        if moving_left:
+            dx = -self.speed
+            self.flip = True
+            self.direction = -1
+        if moving_right:
+            dx = self.speed
+            self.flip = False
+            self.direction = 1
 
         #jumping
-        if self.skillLvl == 0:
-            if isJump ==False:
-                if keys[pygame.K_SPACE]:
-                   isJump = True
-            if isJump:
-                #F is the force
-                F = (1/2)*m*(v**2)
-                #we need to properly clean up the Player class before this method can work
-                y_position = self.get_position()
-                v = v-1
-                if v<0:
-                    m=-1
-                if v==-6:
-                    isJump= False
+        if self.jump == True and self.mid_jump == False:
+            self.vel_y = -11
+            self.jump = False
+            self.mid_jump = True
 
-                    #reset
-                    v=5
-                    m=1
+        #gravity
+        self.vel_y += 0.75
+        if self.vel_y>10:
+            self.vel_y
+        dy += self.vel_y
 
-        #if double jump is unlocked
-        if self.skillLvl>0:
-            if isJump ==False and jumpCounter<=2:
-                if keys[pygame.K_SPACE]:
-                   isJump = True
-                   jumpCounter+=1
-            if isJump:
-                F = (1/2)*m*(v**2)
-                self.position.y -= F
-                v = v-1
-                if v<0:
-                    m=-1
-                if v==-6:
-                    jumpCounter=0
-                    isJump= False
-                    v=5
-                    m=1
-        pygame.time.delay(10)
-        pygame.display.update()    
+        #hit the floor
+        if self.rect.bottom + dy > 622:
+            dy = 622 - self.rect.bottom
+            self.mid_jump = False
+
+        self.rect.x += dx
+        self.rect.y += dy
+# class GameObjects(pygame.sprite.Sprite):
+#     def __init__(self,x,y,image):
+#         super().__init__()
+#         self.image = pygame.image.load(image)
+#         self.rect = self.image.get_rect()
+#         self.rect.center = (x,y)
+#     def update(self):
+#         pass
+#     def draw(self,screen):
+#         screen.blit(self.image,self.rect)
+
+# class Ninja(GameObjects):
+#     def __init__(self, x,y):
+#         self.image = 'groupproject-team-8/Sprites/ninja_hero_sprite.png'
+#         pygame.transform.scale(self.image, (self.image.get_width() / 13, self.image.get_height()/13))
+#         super().__init__(x,y,self.image)
+
+# class Actor(GameObjects):
+#     def __init__(self, x,y,image_file, health, name, skillLvl, speed):
+#         super().__init__(x,y,image_file)
+#         self.name = name
+#         self.health = health
+#         self.skillLvl = skillLvl
+#         self.speed = speed
+#         self.costume_images = {'Black': '', 'Blue': '', 'Red': ''} # Shirley: Add costume images
+
+#     def update(self):
+#         keys = pygame.key.get_pressed()
+#         if keys[pygame.K_LEFT]:
+#             self.move(-10,0)
+#         if keys[pygame.K_RIGHT]:
+#             self.move(10,0)  
+
+#     def move(self,x,y):
+#         self.rect.move_ip([x,y])
+
+#     def draw(self, screen):
+#         super().draw(screen)
+#                     # Setters and Getters
+
+#     def set_name(self, name):
+#         self.name = name
+
+#     def get_name(self):
+#         return self.name
+
+#     def set_health(self, health):
+#         self.health = health
+
+#     def get_health(self):
+#         return self.health
+
+#     def set_skillLvl(self, skillLvl):
+#         self.skillLvl = skillLvl
+
+#     def get_skillLvl(self):
+#         return self.skillLvl
+
+#     def set_costume(self, costume):
+#         self.costume = costume
+#         self.image = pygame.image.load(self.costume_images[costume]).convert_alpha()
+
+#     def get_costume(self):
+#         return self.costume
+
+#     def set_position(self, position):
+#         self.position = position
+
+#     def get_position(self):
+#         return self.position
+
+#     def set_speed(self, speed):
+#         self.speed = speed
+
+#     def get_speed(self):
+#         return self.speed
+    
+#     #Methods
+
+#     #Note to Neda: Feel free to change the move method to whatever you want. I just wanted to get something working.
+
+
+#     #side note: we probably need to run this in the main class under 'while running' since it has to be permanently happening
+    
+#     def move(self):
+#         #will keep track of whether the player is currently mid-air
+#         isJump = False
+#         #v is the velocity of the jump
+#         v = 5
+#         #m is just for the sake of keeping track of gravity
+#         m = 1
+#         #self explanatory
+#         jumpCounter = 0
+#         keys = pygame.key.get_pressed()
+#         if keys[pygame.K_LEFT]:
+#             self.rect.x -= self.speed
+#         if keys[pygame.K_RIGHT]:
+#             self.rect.x += self.speed
+
+#         #jumping
+#         if self.skillLvl == 0:
+#             if isJump ==False:
+#                 if keys[pygame.K_SPACE]:
+#                    isJump = True
+#             if isJump:
+#                 #F is the force
+#                 F = (1/2)*m*(v**2)
+#                 #we need to properly clean up the Player class before this method can work
+#                 y_position = self.get_position()
+#                 v = v-1
+#                 if v<0:
+#                     m=-1
+#                 if v==-6:
+#                     isJump= False
+
+#                     #reset
+#                     v=5
+#                     m=1
+
+#         #if double jump is unlocked
+#         if self.skillLvl>0:
+#             if isJump ==False and jumpCounter<=2:
+#                 if keys[pygame.K_SPACE]:
+#                    isJump = True
+#                    jumpCounter+=1
+#             if isJump:
+#                 F = (1/2)*m*(v**2)
+#                 self.position.y -= F
+#                 v = v-1
+#                 if v<0:
+#                     m=-1
+#                 if v==-6:
+#                     jumpCounter=0
+#                     isJump= False
+#                     v=5
+#                     m=1
+#         pygame.time.delay(10)
+#         pygame.display.update()    
 
         
 
 
-    #Note to Neda: We should have a skill method or a skill class for the double jump and everything? 
+#     #Note to Neda: We should have a skill method or a skill class for the double jump and everything? 
 
-    # Note to Shirley: Just a placeholder for now, can change later
-        # def isHit(self):
-        #     # check if the player is hit by something
-        #     if pygame.sprite.spritecollide(self, enemies_group, False):
-        #         self.health -= 10  # decrease health by 10 points
-        #         if self.health <= 0:
-        #             # player is dead, game over
-        #             game_over()
-
-
-class Enemy(GameObjects):
-    def __init__(self, image_file, health, speed, position):
-        super().__init__(image_file)
-        self.health = health
-        self.speed = speed
-        self.position = position
-
-    # Setters and Getters
-    def set_health(self, health):
-        self.health = health
-
-    def get_health(self):
-        return self.health
-
-    def set_speed(self, speed):
-        self.speed = speed
-
-    def get_speed(self):
-        return self.speed
-
-    def set_position(self, position):
-        self.position = position
-
-    def get_position(self):
-        return self.position
-
-    # Methods
-    def move(self):
-        # Add enemy movement logic here
-        pass
-
-    def hit(self):
-        self.health -= 10  # decrease health by 10 points
-        if self.health <= 0:
-            self.die()
-
-    def die(self):
-        # Add death animation and logic here
-        pass
+#     # Note to Shirley: Just a placeholder for now, can change later
+#         # def isHit(self):
+#         #     # check if the player is hit by something
+#         #     if pygame.sprite.spritecollide(self, enemies_group, False):
+#         #         self.health -= 10  # decrease health by 10 points
+#         #         if self.health <= 0:
+#         #             # player is dead, game over
+#         #             game_over()
 
 
-class Projectile(GameObjects):
-    def __init__(self, image_file, speed, position,damage):
-        super().__init__(image_file)
-        self.speed = speed
-        self.position = position
-        self.damage = damage
+# class Enemy(GameObjects):
+#     def __init__(self, image_file, health, speed, position):
+#         super().__init__(image_file)
+#         self.health = health
+#         self.speed = speed
+#         self.position = position
 
-    # Setters and Getters
-    def set_speed(self, speed):
-        self.speed = speed
+#     # Setters and Getters
+#     def set_health(self, health):
+#         self.health = health
 
-    def get_speed(self):
-        return self.speed
+#     def get_health(self):
+#         return self.health
 
-    def set_position(self, position):
-        self.position = position
+#     def set_speed(self, speed):
+#         self.speed = speed
 
-    def get_position(self):
-        return self.position
+#     def get_speed(self):
+#         return self.speed
+
+#     def set_position(self, position):
+#         self.position = position
+
+#     def get_position(self):
+#         return self.position
+
+#     # Methods
+#     def move(self):
+#         # Add enemy movement logic here
+#         pass
+
+#     def hit(self):
+#         self.health -= 10  # decrease health by 10 points
+#         if self.health <= 0:
+#             self.die()
+
+#     def die(self):
+#         # Add death animation and logic here
+#         pass
+
+
+# class Projectile(GameObjects):
+#     def __init__(self, image_file, speed, position,damage):
+#         super().__init__(image_file)
+#         self.speed = speed
+#         self.position = position
+#         self.damage = damage
+
+#     # Setters and Getters
+#     def set_speed(self, speed):
+#         self.speed = speed
+
+#     def get_speed(self):
+#         return self.speed
+
+#     def set_position(self, position):
+#         self.position = position
+
+#     def get_position(self):
+#         return self.position
     
-    def set_damage(self, damage):
-        self.damage = damage
+#     def set_damage(self, damage):
+#         self.damage = damage
     
-    def get_damage(self):
-        return self.damage
+#     def get_damage(self):
+#         return self.damage
 
-    # Methods
-    def move(self):
-        # Add projectile movement logic here
-        pass
+#     # Methods
+#     def move(self):
+#         # Add projectile movement logic here
+#         pass
 
-    def hit(self):
-        # Add projectile hit logic here
-        pass
+#     def hit(self):
+#         # Add projectile hit logic here
+#         pass
 
-    def die(self):
-        # Add projectile death logic here
-        pass
+#     def die(self):
+#         # Add projectile death logic here
+#         pass
 
     
 
