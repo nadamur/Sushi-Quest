@@ -17,8 +17,8 @@ class Ninja(pygame.sprite.Sprite):
         self.jump_counter = 0
         self.update_time = pygame.time.get_ticks()
 
-        img = pygame.image.load('groupproject-team-8/Sprites/ninja_hero_sprite.png')
-        health = pygame.image.load('groupproject-team-8/Sprites/temp_healthbar.jpg')
+        img = pygame.image.load('Sprites/ninja_hero_sprite.png')
+        health = pygame.image.load('Sprites/temp_healthbar.jpg')
         self.image = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
