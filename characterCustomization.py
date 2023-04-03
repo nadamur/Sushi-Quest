@@ -55,23 +55,29 @@ WHITE = (255, 255, 255)
 
 
 
-def draw_window(selected_color, input_text):
+def draw_window(selected_color, input_text, name):
 
     WIN.blit(background, (0, 0))  # Draw the background image
-
-    # Draw the ninja sprite
-    WIN.blit(ninja_sprites[selected_color], (SCREEN_WIDTH // 2 - ninja_sprites[selected_color].get_width() // 2, 295))
 
     # Draw the text
     font = pygame.font.Font("Fonts/COMICBD.TTF", 16)
     color_text = font.render(f"Toggle between the left and right arrow keys to selected colors: {selected_color.capitalize()}", True, WHITE)
     WIN.blit(color_text, (SCREEN_WIDTH // 2 - color_text.get_width() // 2, 570))
     
+    # Draw the ninja sprite
+    WIN.blit(ninja_sprites[selected_color], (SCREEN_WIDTH // 2 - ninja_sprites[selected_color].get_width() // 2, 295))
+
     # Draw the input box
     font = pygame.font.Font("Fonts/COMIC.TTF", 30)
     label = font.render("Change the character's name:", True, WHITE)
-    WIN.blit(label, (SCREEN_WIDTH // 2 - label.get_width() // 2, 70))
+    namePrinted = font.render(f"{name}", True, (0, 0, 0))
+    WIN.blit(label, (SCREEN_WIDTH // 2 - label.get_width() // 2, 50))
+    WIN.blit(namePrinted, (SCREEN_WIDTH // 2 - namePrinted.get_width() // 2, 300))
     input_rect = input_box(input_text, SCREEN_WIDTH // 2 - 130 // 2, 130)
+    font1 = pygame.font.Font("Fonts/COMIC.TTF", 17)
+    label1 = font1.render("Press enter to save the name", True, WHITE)
+    WIN.blit(label1, (SCREEN_WIDTH // 2 - label1.get_width() // 2, 90))
+
     pygame.display.update()
     return input_rect
     
@@ -80,9 +86,10 @@ def main():
     global selected_color
     run = True
     input_text = "Ninja"
+    name = "Ninja"
     active = True
     while run:
-        input_rect = draw_window(selected_color, input_text)
+        input_rect = draw_window(selected_color, input_text, name)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -95,14 +102,15 @@ def main():
                     if event.key == pygame.K_BACKSPACE:
                         input_text = input_text[:-1]
                     elif event.key == pygame.K_RETURN:
-                        print("Character name:", input_text)
+                        name = input_text # save the name of the character
+                        ninjaColor = selected_color # save the color of the character
                     else:
                         input_text += event.unicode
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if input_rect.collidepoint(event.pos):
-                    active = not active
-                else:
-                    active = False
+            # if event.type == pygame.MOUSEBUTTONDOWN:
+            #     if input_rect.collidepoint(event.pos):
+            #         active = not active
+            #     else:
+            #         active = False
     pygame.quit()
 
 if __name__ == "__main__":
