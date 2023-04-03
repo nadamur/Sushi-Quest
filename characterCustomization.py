@@ -94,7 +94,7 @@ def draw_starting_screen(mouse_pos):
     return button_rect
 
 
-# ----------------------- Create Button Method -------------------------
+# ----------------------- Create Button Function -------------------------
 def create_button(text, pos, text_color=WHITE, border_color=BLACK, padding=10, border_width=0, font_path="Fonts/COMIC.TTF", font_size=30):
     button_font = pygame.font.Font(font_path, font_size)
     button_text = button_font.render(text, True, text_color)
@@ -157,25 +157,6 @@ def draw_background_page(mouse_pos):
         button_rect = create_button("Continue", (400, 500), border_color=(251, 47, 0))
     else:
         button_rect = create_button("Continue", (400, 500), text_color=BLACK, border_color=WHITE)
-
-    # # Draw the continue button
-    # button_font = pygame.font.Font("Fonts/COMIC.TTF", 30)
-    # button_text = button_font.render(" Continue ", True, WHITE)
-    # button_rect = button_text.get_rect()
-    # button_rect.center = (400, 500)
-
-    
-    # # Check if the mouse is hovering over the button
-    # if button_rect.collidepoint(mouse_pos):
-    #     pygame.draw.rect(WIN, (251, 47, 0), button_rect)  # Fill the button with red
-    #     button_text = button_font.render(" Continue ", True, WHITE)  # Set text color to white
-    # else:
-    #     pygame.draw.rect(WIN, WHITE, button_rect)  # Fill the button with white
-    #     button_text = button_font.render(" Continue ", True, BLACK)  # Set text color to black
-
-    # # Draw the button
-    # WIN.blit(button_text, button_rect)
-    # pygame.draw.rect(WIN, BLACK, button_rect, 1)
 
     pygame.display.update()
     return button_rect
