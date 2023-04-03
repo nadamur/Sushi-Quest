@@ -12,9 +12,11 @@ pygame.display.set_caption("Ninja Character Customization")
 
 # Load background image
 start_bg = pygame.image.load("Assets/Backgrounds/start_background.png")
+start_effect = pygame.image.load("Assets/Backgrounds/start_effect.png")
 original_width, original_height = start_bg.get_size()
 new_width = int(SCREEN_HEIGHT * (original_width / original_height))
 start_bg = pygame.transform.scale(start_bg, (new_width, SCREEN_HEIGHT))
+start_effect = pygame.transform.scale(start_effect, (new_width, SCREEN_HEIGHT))
 
 # Colors
 WHITE = (255, 255, 255)
@@ -36,22 +38,23 @@ def draw_starting_screen(mouse_pos):
     WIN.blit(creators_text, (SCREEN_WIDTH // 2 - creators_text.get_width() // 2, 170))
 
     # Draw the start button
-    button_font = pygame.font.Font("Fonts/COMIC.TTF", 36)
+    button_font = pygame.font.Font("Fonts/COMIC.TTF", 40)
     button_text = button_font.render("Start", True, BLACK)
     button_rect = button_text.get_rect()
-    button_rect.center = (SCREEN_WIDTH // 2, 400)
+    button_rect.center = (SCREEN_WIDTH // 2, 425)
 
     # Check if the mouse is hovering over the button
     if button_rect.collidepoint(mouse_pos):
-        pygame.draw.rect(WIN, BLACK, button_rect)  # Fill the button with black
-        button_text = button_font.render("Start", True, WHITE)  # Set text color to white
+        WIN.blit(start_effect, (0, 0))  # Draw the background image
+        # pygame.draw.rect(WIN, BLACK, button_rect)  # Fill the button with black
+        button_text = button_font.render("Start", True, (251, 47, 0))  # Set text color to red
     else:
-        pygame.draw.rect(WIN, WHITE, button_rect)  # Fill the button with white
+        # pygame.draw.rect(WIN, WHITE, button_rect)  # Fill the button with white
         button_text = button_font.render("Start", True, BLACK)  # Set text color to black
 
 
     WIN.blit(button_text, button_rect)
-    pygame.draw.rect(WIN, WHITE, button_rect, 2)
+    # pygame.draw.rect(WIN, WHITE, button_rect, 2)
 
     pygame.display.update()
     return button_rect
