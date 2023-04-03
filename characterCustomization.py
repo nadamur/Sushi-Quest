@@ -26,23 +26,29 @@ def draw_starting_screen(mouse_pos):
     WIN.blit(start_bg, (0, 0))  # Draw the background image
 
     # Draw the game title
-    title_font = pygame.font.Font("Fonts/COMICBD.TTF", 48)
-    title_text = title_font.render("Sushi Quest: a Ninja's Journey", True, WHITE)
+    title_font = pygame.font.Font("Fonts/COMICBD.TTF", 45)
+    title_text = title_font.render("Sushi Quest: A Ninja's Journey", True, WHITE)
     WIN.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, 100))
+
+    # Add creators names
+    creators_font = pygame.font.Font("Fonts/COMIC.TTF", 15)
+    creators_text = creators_font.render("Created by: Neda, Luke, Shirley and Kyloc", True, WHITE)
+    WIN.blit(creators_text, (SCREEN_WIDTH // 2 - creators_text.get_width() // 2, 170))
 
     # Draw the start button
     button_font = pygame.font.Font("Fonts/COMIC.TTF", 36)
     button_text = button_font.render("Start", True, BLACK)
     button_rect = button_text.get_rect()
-    button_rect.center = (SCREEN_WIDTH // 2, 300)
+    button_rect.center = (SCREEN_WIDTH // 2, 400)
 
     # Check if the mouse is hovering over the button
     if button_rect.collidepoint(mouse_pos):
-        pygame.draw.rect(WIN, WHITE, button_rect)  # Fill the button with white
-        button_text = button_font.render("Start", True, BLACK)  # Set text color to black
-    else:
         pygame.draw.rect(WIN, BLACK, button_rect)  # Fill the button with black
         button_text = button_font.render("Start", True, WHITE)  # Set text color to white
+    else:
+        pygame.draw.rect(WIN, WHITE, button_rect)  # Fill the button with white
+        button_text = button_font.render("Start", True, BLACK)  # Set text color to black
+
 
     WIN.blit(button_text, button_rect)
     pygame.draw.rect(WIN, WHITE, button_rect, 2)
