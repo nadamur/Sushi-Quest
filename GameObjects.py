@@ -4,7 +4,8 @@ class Ninja(pygame.sprite.Sprite):
     def __init__(self, char_type,x, y, scale,speed):
         pygame.sprite.Sprite.__init__(self)
         self.alive = True
-        self.char_type = char_type
+        #separate class for enemy, this is not necessary
+        #self.char_type = char_type
         self.speed = speed
         self.direction = 1
         self.vel_y = 0
@@ -67,8 +68,51 @@ class Ninja(pygame.sprite.Sprite):
         self.rect.x += dx
         self.rect.y += dy
 
+class EnemyNinja(pygame.sprite.Sprite):
+    def __init__(self, x, y, scale):
+        pygame.sprite.Sprite.__init__(self)
+        self.alive = True
+        self.direction = 1
+        self.flip = False
+        self.action = 0
+        self.health = 100
+        self.max_health = self.health
+        self.jump_counter = 0
+        self.update_time = pygame.time.get_ticks()
+        self.move_counter = 0
+        self. vision = pygame.Rect(0,0,300,640)
+        self.idling = False
+        self.idling_counter = 0
+        img = pygame.image.load('Assets/Ninja/ninja_hero_sprite_orange.png')
+        self.image = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
 
+    def update(self):
+        self.dead()
 
+    def dead(self):
+        if self.health <=0:
+            self.health = 0
+            self.speed = 0
+            self.alive = False
+
+    
+    def draw(self,screen):
+        screen.blit(pygame.transform.flip(self.image,self.flip,False),self.rect)
+
+    def throw_star(self,sprite_group):
+        star = Star(self.rect.centerx + (0.75 * self.rect.size[0]*self.direction),self.rect.centery,self.direction)
+        sprite_group.add(star)
+
+    def ai(self,ninja,sprite_group):
+        if self.alive and ninja.alive:
+            if self.idling == False and random.randint(1,200) == 1:
+                self.idling = True
+                self.idling_counter = 50
+            if self.vision.colliderect(ninja.rect):
+                self.throw_star(sprite_group)
+            
 class Star(pygame.sprite.Sprite):
     def __init__(self, x,y,direction):
         pygame.sprite.Sprite.__init__(self)

@@ -67,9 +67,13 @@ def draw_bg():
     screen.fill(BG)
     pygame.draw.line(screen,red,(0,600),(SCREEN_WIDTH,600))
 
+enemy_ninjas_group = pygame.sprite.Group()
 ninja = GameObjects.Ninja('ninja',200,200,13,7)
 healthbar = GameObjects.HealthBar(20,20,ninja.health,ninja.health)
 star_group = pygame.sprite.Group()
+enemy_ninja1 = GameObjects.EnemyNinja(600,578,13)
+enemy_ninjas_group.add(enemy_ninja1)
+
 
 # Game functions
 def star_hit(self):
@@ -106,12 +110,13 @@ while run:
     world.draw()
     healthbar.draw(ninja.health,screen)
     ninja.draw(screen)
+    for enemy in enemy_ninjas_group:
+         enemy.ai(ninja,star_group)
+         enemy.update()
+         enemy.draw(screen)
+
     if ninja.alive:
         ninja.move(moving_left,moving_right)
-    #star collision logic
-    star_collisions = pygame.sprite.groupcollide(star_group,ninja,True,False)
-    for star in star_collisions:
-        star_hit()
     #game logic
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
