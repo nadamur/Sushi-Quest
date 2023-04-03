@@ -11,10 +11,49 @@ WIN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Ninja Character Customization")
 
 # Load background image
-background = pygame.image.load("Assets/Backgrounds/characterCustomization_background.png")
-original_width, original_height = background.get_size()
+start_bg = pygame.image.load("Assets/Backgrounds/start_background.png")
+original_width, original_height = start_bg.get_size()
 new_width = int(SCREEN_HEIGHT * (original_width / original_height))
-background = pygame.transform.scale(background, (new_width, SCREEN_HEIGHT))
+start_bg = pygame.transform.scale(start_bg, (new_width, SCREEN_HEIGHT))
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+
+
+# Starting screen
+def draw_starting_screen(mouse_pos):
+    WIN.blit(start_bg, (0, 0))  # Draw the background image
+
+    # Draw the game title
+    title_font = pygame.font.Font("Fonts/COMICBD.TTF", 48)
+    title_text = title_font.render("Sushi Quest: a Ninja's Journey", True, WHITE)
+    WIN.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, 100))
+
+    # Draw the start button
+    button_font = pygame.font.Font("Fonts/COMIC.TTF", 36)
+    button_text = button_font.render("Start", True, BLACK)
+    button_rect = button_text.get_rect()
+    button_rect.center = (SCREEN_WIDTH // 2, 300)
+
+    # Check if the mouse is hovering over the button
+    if button_rect.collidepoint(mouse_pos):
+        pygame.draw.rect(WIN, WHITE, button_rect)  # Fill the button with white
+        button_text = button_font.render("Start", True, BLACK)  # Set text color to black
+    else:
+        pygame.draw.rect(WIN, BLACK, button_rect)  # Fill the button with black
+        button_text = button_font.render("Start", True, WHITE)  # Set text color to white
+
+    WIN.blit(button_text, button_rect)
+    pygame.draw.rect(WIN, WHITE, button_rect, 2)
+
+    pygame.display.update()
+    return button_rect
+
+
+
+
+# Character customization screen
 
 # Load and resize ninja images
 NINJA_COLORS = {
@@ -50,14 +89,10 @@ def input_box(input_text, x, y):
 selected_color = "blue"
 ninja = ninja_sprites[selected_color]
 
-# Colors
-WHITE = (255, 255, 255)
 
+def draw_characterCustomization(selected_color, input_text, name):
 
-
-def draw_window(selected_color, input_text, name):
-
-    WIN.blit(background, (0, 0))  # Draw the background image
+    WIN.blit(start_bg, (0, 0))  # Draw the background image
 
     # Draw the text
     font = pygame.font.Font("Fonts/COMICBD.TTF", 16)
@@ -70,7 +105,7 @@ def draw_window(selected_color, input_text, name):
     # Draw the input box
     font = pygame.font.Font("Fonts/COMIC.TTF", 30)
     label = font.render("Change the character's name:", True, WHITE)
-    namePrinted = font.render(f"{name}", True, (0, 0, 0))
+    namePrinted = font.render(f"{name}", True, BLACK)
     WIN.blit(label, (SCREEN_WIDTH // 2 - label.get_width() // 2, 50))
     WIN.blit(namePrinted, (SCREEN_WIDTH // 2 - namePrinted.get_width() // 2, 300))
     input_rect = input_box(input_text, SCREEN_WIDTH // 2 - 130 // 2, 130)
@@ -83,13 +118,32 @@ def draw_window(selected_color, input_text, name):
     
 
 def main():
+
+    run = True # Main loop
+
+    # Starting screen loop
+    starting_screen = True
+    while starting_screen and run:
+        mouse_pos = pygame.mouse.get_pos()
+        start_button = draw_starting_screen(mouse_pos)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                starting_screen = False
+                run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if start_button.collidepoint(event.pos):
+                    starting_screen = False
+
+    # Character customization variables
     global selected_color
-    run = True
+    customization_screen = True
     input_text = "Ninja"
     name = "Ninja"
     active = True
-    while run:
-        input_rect = draw_window(selected_color, input_text, name)
+
+    # Character customization loop
+    while customization_screen and run:
+        input_rect = draw_characterCustomization(selected_color, input_text, name)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -106,11 +160,13 @@ def main():
                         ninjaColor = selected_color # save the color of the character
                     else:
                         input_text += event.unicode
+
             # if event.type == pygame.MOUSEBUTTONDOWN:
             #     if input_rect.collidepoint(event.pos):
             #         active = not active
             #     else:
             #         active = False
+             
     pygame.quit()
 
 if __name__ == "__main__":
