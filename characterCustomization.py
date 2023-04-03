@@ -13,15 +13,46 @@ pygame.display.set_caption("Ninja Character Customization")
 # Load background image
 start_bg = pygame.image.load("Assets/Backgrounds/start_background.png")
 start_effect = pygame.image.load("Assets/Backgrounds/start_effect.png")
+intro_bg = pygame.image.load("Assets/Backgrounds/intro_background.png")
 original_width, original_height = start_bg.get_size()
 new_width = int(SCREEN_HEIGHT * (original_width / original_height))
 start_bg = pygame.transform.scale(start_bg, (new_width, SCREEN_HEIGHT))
 start_effect = pygame.transform.scale(start_effect, (new_width, SCREEN_HEIGHT))
+intro_bg = pygame.transform.scale(intro_bg, (new_width, SCREEN_HEIGHT))
 
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
+
+# ------------------------ Starting screen -------------------------------- 
+
+def create_button(text, font, color, bg_color, pos, padding=10, border_width=1, border_color=BLACK):
+    """
+    Creates a button with the given text, font, color, and background color at the given position.
+    """
+    text_surface = font.render(text, True, color)
+    button_rect = text_surface.get_rect()
+    button_rect.center = pos
+
+    # Check if the mouse is hovering over the button
+    mouse_pos = pygame.mouse.get_pos()
+    if button_rect.collidepoint(mouse_pos):
+        pygame.draw.rect(WIN, bg_color, button_rect)  # Fill the button with background color
+        text_surface = font.render(text, True, color)  # Set text color to foreground color
+    else:
+        pygame.draw.rect(WIN, color, button_rect)  # Fill the button with foreground color
+        text_surface = font.render(text, True, bg_color)  # Set text color to background color
+
+    # Add padding and border to the button
+    button_rect.inflate_ip(padding, padding)
+    pygame.draw.rect(WIN, border_color, button_rect, border_width)
+
+    # Draw the button and update the display
+    WIN.blit(text_surface, text_surface.get_rect(center=pos))
+    pygame.display.update(button_rect)
+
+    return button_rect
 
 
 
@@ -58,6 +89,93 @@ def draw_starting_screen(mouse_pos):
 
     WIN.blit(button_text, button_rect)
     # pygame.draw.rect(WIN, WHITE, button_rect, 2)
+
+    pygame.display.update()
+    return button_rect
+
+
+# ----------------------- Create Button Method -------------------------
+def create_button(text, pos, text_color=WHITE, border_color=BLACK, padding=10, border_width=0, font_path="Fonts/COMIC.TTF", font_size=30):
+    button_font = pygame.font.Font(font_path, font_size)
+    button_text = button_font.render(text, True, text_color)
+    button_rect = button_text.get_rect()
+    button_rect.inflate_ip(padding * 2, 0)
+    button_rect.center = pos
+
+    pygame.draw.rect(WIN, border_color, button_rect, border_width)
+    WIN.blit(button_text, (button_rect.x + padding, button_rect.y))
+
+    return button_rect
+
+
+# ----------------------- Background screen ------------------------- 
+
+
+def draw_background_page(mouse_pos):
+    WIN.blit(intro_bg, (0, 0))  # Draw the background image
+
+    # Draw the game title
+    title_font = pygame.font.Font("Fonts/COMICBD.TTF", 45)
+    title_text = title_font.render("Background", True, WHITE)
+    WIN.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, 100))
+
+
+    # Draw the game introduction text
+    intro_font = pygame.font.Font("Fonts/COMIC.TTF", 18)
+    intro_text = (
+        "You are a skilled ninja on a mission to create the ultimate sushi, a revered work of art in this enchanted world. "
+        "Armed with your lightning-fast reflexes, you must collect the sushi ingredients through combating various challenges. "
+        "Along the way, wise NPCs will offer hints and humor to aid you. Will you rise to the challenge and craft the ultimate sushi? "
+        "The journey begins now."
+    )
+    intro_lines = intro_text.split(" ")
+    rendered_lines = []
+    current_line = ""
+
+    for word in intro_lines:
+        temp_line = current_line + word + " "
+        if intro_font.size(temp_line)[0] > SCREEN_WIDTH - 60:
+            rendered_lines.append(current_line)
+            current_line = word + " "
+        else:
+            current_line = temp_line
+
+    rendered_lines.append(current_line)
+
+    y_pos = 220
+    for line in rendered_lines:
+        rendered_text = intro_font.render(line, True, WHITE)
+        WIN.blit(rendered_text, (30, y_pos))
+        y_pos += rendered_text.get_height() + 5
+
+
+    # Draw the continue button using the create_button function
+    button_rect = create_button("Continue", (400, 500))
+
+    # Update the button colors based on mouse hover
+    if button_rect.collidepoint(mouse_pos):
+        button_rect = create_button("Continue", (400, 500), border_color=(251, 47, 0))
+    else:
+        button_rect = create_button("Continue", (400, 500), text_color=BLACK, border_color=WHITE)
+
+    # # Draw the continue button
+    # button_font = pygame.font.Font("Fonts/COMIC.TTF", 30)
+    # button_text = button_font.render(" Continue ", True, WHITE)
+    # button_rect = button_text.get_rect()
+    # button_rect.center = (400, 500)
+
+    
+    # # Check if the mouse is hovering over the button
+    # if button_rect.collidepoint(mouse_pos):
+    #     pygame.draw.rect(WIN, (251, 47, 0), button_rect)  # Fill the button with red
+    #     button_text = button_font.render(" Continue ", True, WHITE)  # Set text color to white
+    # else:
+    #     pygame.draw.rect(WIN, WHITE, button_rect)  # Fill the button with white
+    #     button_text = button_font.render(" Continue ", True, BLACK)  # Set text color to black
+
+    # # Draw the button
+    # WIN.blit(button_text, button_rect)
+    # pygame.draw.rect(WIN, BLACK, button_rect, 1)
 
     pygame.display.update()
     return button_rect
@@ -149,13 +267,25 @@ def main():
                 if start_button.collidepoint(event.pos):
                     starting_screen = False
 
+    # Background page loop
+    background_page = True
+    while background_page and run:
+        mouse_pos = pygame.mouse.get_pos()
+        continue_button = draw_background_page(mouse_pos)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                background_page = False
+                run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if continue_button.collidepoint(event.pos):
+                    background_page = False
+
     # Character customization variables
     global selected_color
     customization_screen = True
     input_text = "Ninja"
     name = "Ninja"
     active = True
-
     # Character customization loop
     while customization_screen and run:
         input_rect = draw_characterCustomization(selected_color, input_text, name)
