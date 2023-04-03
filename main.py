@@ -53,6 +53,7 @@ class World():
 
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
 pygame.display.set_caption('ninjagame')
 clock = pygame.time.Clock()
 FPS = 60
@@ -61,12 +62,13 @@ moving_right = False
 BG = (144,201,100)
 red = (255,0,0)
 
+
 def draw_bg():
     screen.fill(BG)
     pygame.draw.line(screen,red,(0,600),(SCREEN_WIDTH,600))
 
-
 ninja = GameObjects.Ninja('ninja',200,200,13,7)
+healthbar = GameObjects.HealthBar(20,20,ninja.health,ninja.health)
 star_group = pygame.sprite.Group()
 
 # Game functions
@@ -102,6 +104,7 @@ while run:
     clock.tick(FPS)
     draw_bg()
     world.draw()
+    healthbar.draw(ninja.health,screen)
     ninja.draw(screen)
     if ninja.alive:
         ninja.move(moving_left,moving_right)

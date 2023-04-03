@@ -12,13 +12,12 @@ class Ninja(pygame.sprite.Sprite):
         self.flip = False
         self.frame_index = 0
         self.action = 0
-        self.health = 0
+        self.health = 100
         self.max_health = self.health
         self.jump_counter = 0
         self.update_time = pygame.time.get_ticks()
 
         img = pygame.image.load('Sprites/ninja_hero_sprite.png')
-        health = pygame.image.load('Sprites/temp_healthbar.jpg')
         self.image = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
@@ -84,6 +83,23 @@ class Star(pygame.sprite.Sprite):
         #check if off screen, 800 is screen width
         if self.rect.right < 0 or self.rect.left > 800:
             self.kill()
+
+class HealthBar():
+    def __init__(self, x, y, health, max_health):
+        self.x = x
+        self.y = y
+        self.health = health
+        self.max_health = max_health
+
+    def draw(self, health,screen):
+        black = (0,0,0)
+        red = (255,0,0)
+        green = (0,255,0)
+        self.health = health
+        ratio = self.health / self.max_health
+        pygame.draw.rect(screen, black, (self.x - 2, self.y - 2, 154, 24))
+        pygame.draw.rect(screen, red, (self.x, self.y, 150, 20))
+        pygame.draw.rect(screen, green, (self.x, self.y, 150 * ratio, 20))
 
 # class GameObjects(pygame.sprite.Sprite):
 #     def __init__(self,x,y,image):
