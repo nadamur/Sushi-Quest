@@ -23,7 +23,10 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 
-# Starting screen
+
+
+# ------------------------ Starting screen -------------------------------- 
+
 def draw_starting_screen(mouse_pos):
     WIN.blit(start_bg, (0, 0))  # Draw the background image
 
@@ -61,8 +64,7 @@ def draw_starting_screen(mouse_pos):
 
 
 
-
-# Character customization screen
+# ----------------------- Character customization screen ------------------------- 
 
 # Load and resize ninja images
 NINJA_COLORS = {
@@ -125,6 +127,10 @@ def draw_characterCustomization(selected_color, input_text, name):
     pygame.display.update()
     return input_rect
     
+
+
+
+# -------------------------------- Main Loop -------------------------------------
 
 def main():
 
