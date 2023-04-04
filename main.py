@@ -21,7 +21,10 @@ screen_scroll = 0
 bg_scroll = 0
 
 #loading the background
-ninja_forest = pygame.image.load('assets/backgrounds/ninja_forest_background.jpg')
+ninja_forest = pygame.image.load('assets/backgrounds/ninja_forest_background.png')
+original_width, original_height = ninja_forest.get_size()
+new_width = int(SCREEN_HEIGHT * (original_width / original_height))
+ninja_forest = pygame.transform.scale(ninja_forest, (new_width, SCREEN_HEIGHT))
 
 #making list for different blocks in the game
 img_list = []
@@ -29,6 +32,7 @@ for x in range(TILE_TYPES):
     img = pygame.image.load(f'tile/{x}.png')
     img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
     img_list.append(img)
+    
 
 #creating the player
 class Ninja(pygame.sprite.Sprite):
@@ -173,7 +177,7 @@ def draw_bg():
     screen.fill(BG)
     width = ninja_forest.get_width()
     for x in range(5):
-        screen.blit(ninja_forest, ((x * width) - bg_scroll * 0.5, 100))
+        screen.blit(ninja_forest, ((x * width) - bg_scroll * 0.5, 0))
 
 
 # enemy_ninjas_group = pygame.sprite.Group()
