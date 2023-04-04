@@ -43,7 +43,7 @@ class Ninja(pygame.sprite.Sprite):
         self.flip = False
         self.frame_index = 0
         self.action = 0
-        self.health = 0
+        self.health = 100
         self.max_health = self.health
         self.jump_counter = 0
         self.update_time = pygame.time.get_ticks()
@@ -125,7 +125,6 @@ class Ninja(pygame.sprite.Sprite):
                 self.rect.x -= dx
                 screen_scroll = -dx
 
-
         return screen_scroll
 
 
@@ -148,6 +147,7 @@ class World():
                         self.obstacle_list.append(tile_data)
                     elif tile == 15:  # create player
                         ninja = Ninja('ninja', x * TILE_SIZE, y * TILE_SIZE, 13, 7)
+                    
         return ninja
 
     def draw(self):
@@ -159,6 +159,7 @@ class World():
 
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
 pygame.display.set_caption('ninjagame')
 clock = pygame.time.Clock()
 FPS = 60
@@ -167,6 +168,7 @@ moving_right = False
 BG = (144,201,100)
 red = (255,0,0)
 
+
 def draw_bg():
     screen.fill(BG)
     width = ninja_forest.get_width()
@@ -174,8 +176,14 @@ def draw_bg():
         screen.blit(ninja_forest, ((x * width) - bg_scroll * 0.5, 100))
 
 
+# enemy_ninjas_group = pygame.sprite.Group()
 ninja = Ninja('ninja',200,200,13,7)
-star_group = pygame.sprite.Group()
+
+# healthbar = GameObjects.HealthBar(20,20,ninja.health,ninja.health)
+# star_group = pygame.sprite.Group()
+# enemy_ninja1 = GameObjects.EnemyNinja(600,578,13)
+# enemy_ninjas_group.add(enemy_ninja1)
+
 
 # Game functions
 def star_hit(self):
@@ -210,16 +218,26 @@ while run:
     clock.tick(FPS)
     draw_bg()
     world.draw()
+   
+    # commenting out the enemy for now
+    # healthbar.draw(ninja.health,screen)
+
     ninja.draw(screen)
+
+    # for enemy in enemy_ninjas_group:
+    #      enemy.ai(ninja,star_group)
+    #      enemy.update()
+    #      enemy.draw(screen)
+
     if ninja.alive:
         screen_scroll = ninja.move(moving_left,moving_right)
         bg_scroll -= screen_scroll
 
 
     #star collision logic
-    star_collisions = pygame.sprite.groupcollide(star_group,ninja,True,False)
-    for star in star_collisions:
-        star_hit()
+    # star_collisions = pygame.sprite.groupcollide(star_group,ninja,True,False)
+    # for star in star_collisions:
+    #     star_hit()
     #game logic
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
