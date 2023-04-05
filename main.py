@@ -51,6 +51,8 @@ class Ninja(pygame.sprite.Sprite):
         self.max_health = self.health
         self.jump_counter = 0
         self.update_time = pygame.time.get_ticks()
+        self.idling = False
+        self.idling_counter = 0
 
         img = pygame.image.load('Sprites/ninja_hero_sprite.png')
         health = pygame.image.load('Sprites/temp_healthbar.jpg')
@@ -70,6 +72,11 @@ class Ninja(pygame.sprite.Sprite):
     
     def draw(self,screen):
         screen.blit(pygame.transform.flip(self.image,self.flip,False),self.rect)
+
+    def ai(self):
+            if self.alive and ninja.alive:
+                if self.idling == False and random.randint(1,200) == 1:
+                    self.idling = True
 
     def move(self, moving_left,moving_right):
         screen_scroll = 0
@@ -150,7 +157,11 @@ class World():
                     if tile >= 0 and tile <= 8:
                         self.obstacle_list.append(tile_data)
                     elif tile == 15:  # create player
-                        ninja = Ninja('ninja', x * TILE_SIZE, y * TILE_SIZE, 13, 7)
+                        ninja = Ninja('ninja', x * TILE_SIZE, y * TILE_SIZE, 15, 7)
+                    elif tile == 16: # create enemy
+                        self.obstacle_list.append(tile_data)
+                        enemy = Ninja('enemy', x * TILE_SIZE, y * TILE_SIZE, 15, 7)
+                        enemy_ninja_group.add(enemy)
                     
         return ninja
 
@@ -180,12 +191,15 @@ def draw_bg():
         screen.blit(ninja_forest, ((x * width) - bg_scroll * 0.5, 0))
 
 
-# enemy_ninjas_group = pygame.sprite.Group()
-ninja = Ninja('ninja',200,200,13,7)
+enemy_ninja_group = pygame.sprite.Group()
+
 
 # healthbar = GameObjects.HealthBar(20,20,ninja.health,ninja.health)
 # star_group = pygame.sprite.Group()
-# enemy_ninja1 = GameObjects.EnemyNinja(600,578,13)
+
+# creating enemies
+# enemy_ninjas_group = pygame.sprite.Group()
+# enemy = GameObjects.EnemyNinja(600,578,13)
 # enemy_ninjas_group.add(enemy_ninja1)
 
 
@@ -228,10 +242,12 @@ while run:
 
     ninja.draw(screen)
 
-    # for enemy in enemy_ninjas_group:
-    #      enemy.ai(ninja,star_group)
-    #      enemy.update()
-    #      enemy.draw(screen)
+    #draw enemies on screen
+    for enemy in enemy_ninja_group:
+        enemy.draw(screen)
+        enemy.update()
+        enemy.ai()
+
 
     if ninja.alive:
         screen_scroll = ninja.move(moving_left,moving_right)

@@ -103,17 +103,17 @@ import pygame, random, time, sys
 #     def draw(self,screen):
 #         screen.blit(pygame.transform.flip(self.image,self.flip,False),self.rect)
 
-#     def throw_star(self,sprite_group):
-#         star = Star(self.rect.centerx + (0.75 * self.rect.size[0]*self.direction),self.rect.centery,self.direction)
-#         sprite_group.add(star)
+#     # def throw_star(self,sprite_group):
+#     #     star = Star(self.rect.centerx + (0.75 * self.rect.size[0]*self.direction),self.rect.centery,self.direction)
+#     #     sprite_group.add(star)
 
 #     def ai(self,ninja,sprite_group):
 #         if self.alive and ninja.alive:
 #             if self.idling == False and random.randint(1,200) == 1:
 #                 self.idling = True
 #                 self.idling_counter = 50
-#             if self.vision.colliderect(ninja.rect):
-#                 self.throw_star(sprite_group)
+#             # if self.vision.colliderect(ninja.rect):
+#             #     self.throw_star(sprite_group)
 
 
   
