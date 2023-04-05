@@ -152,7 +152,7 @@ import pygame, random, time, sys
 #     def __init__(self, x,y,direction):
 #         pygame.sprite.Sprite.__init__(self)
 #         self.speed = 10
-#         self.image = pygame.image.load('groupproject-team-8/Sprites/star.png')
+#         self.image = pygame.image.load('groupproject-team-8/Sprites/temp_star.jpg')
 #         self.rect = self.image.get_rect()
 #         self.rect.center = (x,y)
 #         self.direction = direction
@@ -190,7 +190,7 @@ class EnemyStar():
         self.y = y
         self.scale = scale
         self.speed = 10
-        self.image = pygame.image.load('Sprites/star.png')
+        self.image = pygame.image.load('Sprites/temp_star.jpg')
         self.image = pygame.transform.scale(self.image, (self.image.get_width() / scale, self.image.get_height()/scale))
         self.rect = self.image.get_rect()
         self.rect.center = (x,y)
