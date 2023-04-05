@@ -192,12 +192,8 @@ class EnemyNinja(pygame.sprite.Sprite):
     def throw_star(self):
         #throw one star surface
         star = GameObjects.EnemyStar(self.rect.centerx + (0.5 * self.rect.size[0] * self.direction), self.rect.centery, self.direction)
-        return star
+        return star.image
     
-    
-
-
-
     def update(self):
         self.dead()
 
@@ -209,11 +205,6 @@ class EnemyNinja(pygame.sprite.Sprite):
     
     def draw(self,screen):
         screen.blit(pygame.transform.flip(self.image,self.flip,False),self.rect)
-
-    def ai(self):
-            if self.alive and ninja.alive:
-                if self.idling == False and random.randint(1,200) == 1:
-                    self.idling = True
 
     def move(self):
         #screen_scroll = 0
@@ -393,14 +384,7 @@ while run:
         enemy.draw(screen)
         enemy.update()
 
-<<<<<<< HEAD
    
-=======
-    #draw exit on screen
-    exit_group.update()
-    exit_group.draw(screen)
- 
->>>>>>> 065f869a06252a13152f47a64995b27023152be1
 
     if ninja.alive:
         screen_scroll, level_complete = ninja.move(moving_left, moving_right)
