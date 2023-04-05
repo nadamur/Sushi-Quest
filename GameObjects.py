@@ -70,50 +70,79 @@ import pygame, random, time, sys
 
 
 # commenting out the enemy ninja for now
-class EnemyNinja(pygame.sprite.Sprite):
-    def __init__(self, x, y, scale):
-        pygame.sprite.Sprite.__init__(self)
-        self.alive = True
-        self.direction = 1
-        self.flip = False
-        self.action = 0
-        self.health = 100
-        self.max_health = self.health
-        self.jump_counter = 0
-        self.update_time = pygame.time.get_ticks()
-        self.move_counter = 0
-        self. vision = pygame.Rect(0,0,300,640)
-        self.idling = False
-        self.idling_counter = 0
-        img = pygame.image.load('Assets/Ninja/ninja_hero_sprite_orange.png')
-        self.image = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))
-        self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
+# class EnemyNinja(pygame.sprite.Sprite):
+#     def __init__(self, x, y, scale):
+#         pygame.sprite.Sprite.__init__(self)
+#         self.alive = True
+#         self.direction = 1
+#         self.flip = False
+#         self.vel_y = 0
+#         self.action = 0
+#         self.health = 100
+#         self.max_health = self.health
+#         self.jump_counter = 0
+#         self.update_time = pygame.time.get_ticks()
+#         self.move_counter = 0
+#         self. vision = pygame.Rect(0,0,300,640)
+#         self.idling = False
+#         self.idling_counter = 0
+#         img = pygame.image.load('Assets/Ninja/ninja_hero_sprite_orange.png')
+#         self.image = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))
+#         self.rect = self.image.get_rect()
+#         self.rect.center = (x, y)
 
-    def update(self):
-        self.dead()
+#     def update(self):
+#         self.dead()
 
-    def dead(self):
-        if self.health <=0:
-            self.health = 0
-            self.speed = 0
-            self.alive = False
+#     def dead(self):
+#         if self.health <=0:
+#             self.health = 0
+#             self.speed = 0
+#             self.alive = False
 
     
-    def draw(self,screen):
-        screen.blit(pygame.transform.flip(self.image,self.flip,False),self.rect)
+#     def draw(self,screen):
+#         screen.blit(pygame.transform.flip(self.image,self.flip,False),self.rect)
 
-    # def throw_star(self,sprite_group):
-    #     star = Star(self.rect.centerx + (0.75 * self.rect.size[0]*self.direction),self.rect.centery,self.direction)
-    #     sprite_group.add(star)
+#     # def throw_star(self,sprite_group):
+#     #     star = Star(self.rect.centerx + (0.75 * self.rect.size[0]*self.direction),self.rect.centery,self.direction)
+#     #     sprite_group.add(star)
 
-    def ai(self,ninja,sprite_group):
-        if self.alive and ninja.alive:
-            if self.idling == False and random.randint(1,200) == 1:
-                self.idling = True
-                self.idling_counter = 50
-            # if self.vision.colliderect(ninja.rect):
-            #     self.throw_star(sprite_group)
+#     def move(self):
+#         dx = 0
+#         dy = 0
+
+#         #gravity
+#         self.vel_y += 0.75
+#         if self.vel_y>10:
+#             self.vel_y
+#         dy += self.vel_y
+
+#         #collision check
+#         for tile in world.obstacle_list:
+#             #check collision in x direction
+#             if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.rect.width, self.rect.height):
+#                 dx = 0
+#             #check collision in y direction
+#             if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.rect.width, self.rect.height):
+#                 #check if below the ground i.e. jumping
+#                 if self.vel_y < 0:
+#                     dy = tile[1].bottom - self.rect.top
+#                     self.vel_y = 0
+#                 #check if above the ground i.e. falling
+#                 elif self.vel_y >= 0:
+#                     dy = tile[1].top - self.rect.bottom
+#                     self.vel_y = 0
+#                     self.jump_counter = 0
+
+
+    # def ai(self,ninja,sprite_group):
+    #     if self.alive and ninja.alive:
+    #         if self.idling == False and random.randint(1,200) == 1:
+    #             self.idling = True
+    #             self.idling_counter = 50
+    #         # if self.vision.colliderect(ninja.rect):
+    #         #     self.throw_star(sprite_group)
 
 
   
@@ -150,6 +179,20 @@ class HealthBar():
         pygame.draw.rect(screen, black, (self.x - 2, self.y - 2, 154, 24))
         pygame.draw.rect(screen, red, (self.x, self.y, 150, 20))
         pygame.draw.rect(screen, green, (self.x, self.y, 150 * ratio, 20))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # class GameObjects(pygame.sprite.Sprite):
 #     def __init__(self,x,y,image):

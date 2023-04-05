@@ -53,6 +53,7 @@ class Ninja(pygame.sprite.Sprite):
         self.update_time = pygame.time.get_ticks()
         self.idling = False
         self.idling_counter = 0
+        self.vision = pygame.Rect(0,0,150,640)
 
         img = pygame.image.load('Sprites/ninja_hero_sprite.png')
         health = pygame.image.load('Sprites/temp_healthbar.jpg')
@@ -137,6 +138,104 @@ class Ninja(pygame.sprite.Sprite):
                 screen_scroll = -dx
 
         return screen_scroll
+    
+    def ai(self,ninja):
+        if self.alive and ninja.alive:
+            if self.idling == False and random.randint(1,200) == 1:
+                self.idling = True
+                self.idling_counter = 50
+            # if self.vision.colliderect(ninja.rect):
+            #     self.throw_star(sprite_group)
+
+class EnemyNinja(pygame.sprite.Sprite):
+    def __init__(self, x, y, scale,speed):
+        pygame.sprite.Sprite.__init__(self)
+        self.alive = True
+        self.vision = pygame.Rect(0,0,150,640)
+        self.speed = speed
+        self.direction = 1
+        self.vel_y = 0
+        self.jump = False
+        self.flip = False
+        self.frame_index = 0
+        self.action = 0
+        self.health = 100
+        self.max_health = self.health
+        self.jump_counter = 0
+        self.update_time = pygame.time.get_ticks()
+        self.idling = False
+        self.idling_counter = 0
+
+        img = pygame.image.load('Assets/Ninja/ninja_hero_sprite_orange.png')
+        self.image = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+
+    def update(self):
+        self.dead()
+
+    def dead(self):
+        if self.health <=0:
+            self.health = 0
+            self.speed = 0
+            self.alive = False
+    
+    def draw(self,screen):
+        screen.blit(pygame.transform.flip(self.image,self.flip,False),self.rect)
+
+    def ai(self):
+            if self.alive and ninja.alive:
+                if self.idling == False and random.randint(1,200) == 1:
+                    self.idling = True
+
+    def move(self):
+        #screen_scroll = 0
+        dx = 0
+        dy = 0
+
+        #gravity
+        self.vel_y += 0.75
+        if self.vel_y>10:
+            self.vel_y
+        dy += self.vel_y
+
+        #collision check
+        for tile in world.obstacle_list:
+            #check collision in x direction
+            if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.rect.width, self.rect.height):
+                dx = 0
+            #check collision in y direction
+            if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.rect.width, self.rect.height):
+                #check if below the ground i.e. jumping
+                if self.vel_y < 0:
+                    dy = tile[1].bottom - self.rect.top
+                    self.vel_y = 0
+                #check if above the ground i.e. falling
+                elif self.vel_y >= 0:
+                    dy = tile[1].top - self.rect.bottom
+                    self.vel_y = 0
+                    self.jump_counter = 0
+
+        #check if going off the edges of the screen
+        if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
+            dx = 0
+        #update rectangle position
+        self.rect.x += dx
+        self.rect.y += dy
+
+        return screen_scroll
+    
+    def ai(self,ninja):
+        if self.alive and ninja.alive:
+            if self.idling == False and random.randint(1,200) == 1:
+                self.idling = True
+                self.idling_counter = 50
+            # if self.vision.colliderect(ninja.rect):
+            # #     self.throw_star(sprite_group)
+            # else:
+            #     if self.idling == False:
+            #         if self.direction ==1:
+            self.move()
 
 
 #creating the world
@@ -158,11 +257,12 @@ class World():
                         self.obstacle_list.append(tile_data)
                     elif tile == 15:  # create player
                         ninja = Ninja('ninja', x * TILE_SIZE, y * TILE_SIZE, 15, 7)
+                        healthbar = GameObjects.HealthBar(20,20,ninja.health,ninja.health)
                     elif tile == 16: # create enemy
-                        enemy = GameObjects.EnemyNinja(x * TILE_SIZE, y * TILE_SIZE, 15)
+                        enemy = EnemyNinja(x * TILE_SIZE, y * TILE_SIZE, 15,7)
                         enemy_ninja_group.add(enemy)
                     
-        return ninja
+        return ninja, healthbar
 
     def draw(self):
         for tile in self.obstacle_list:
@@ -193,13 +293,10 @@ def draw_bg():
 enemy_ninja_group = pygame.sprite.Group()
 
 
-# healthbar = GameObjects.HealthBar(20,20,ninja.health,ninja.health)
-# star_group = pygame.sprite.Group()
+star_group = pygame.sprite.Group()
 
 # creating enemies
 # enemy_ninjas_group = pygame.sprite.Group()
-# enemy = GameObjects.EnemyNinja(600,578,13)
-# enemy_ninjas_group.add(enemy_ninja1)
 
 
 # Game functions
@@ -225,7 +322,7 @@ with open(f'level{level}_data.csv', newline='') as csvfile:
         for y, tile in enumerate(row):
             world_data[x][y] = int(tile)
 world = World()
-ninja = world.process_data(world_data)            
+ninja, healthbar = world.process_data(world_data)            
 
 
 run = True
@@ -237,12 +334,13 @@ while run:
     world.draw()
    
     # commenting out the enemy for now
-    # healthbar.draw(ninja.health,screen)
-
+    healthbar.draw(ninja.health,screen)
+    ninja.update()
     ninja.draw(screen)
 
     #draw enemies on screen
     for enemy in enemy_ninja_group:
+        enemy.ai(ninja)
         enemy.draw(screen)
         enemy.update()
 
