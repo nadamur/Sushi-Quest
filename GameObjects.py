@@ -182,6 +182,18 @@ class HealthBar():
 
 
 
+class EnemyStar():
+    #game object class for the star
+    def __init__(self, x, y, scale):
+        #moves towards the player at a constant speed and then disappears when it hits the player or the edge of the screen or the ground and starts at the enemy's position
+        self.x = x
+        self.y = y
+        self.scale = scale
+        self.speed = 10
+        self.image = pygame.image.load('Sprites/temp_star.jpg')
+        self.image = pygame.transform.scale(self.image, (self.image.get_width() / scale, self.image.get_height()/scale))
+        self.rect = self.image.get_rect()
+        self.rect.center = (x,y)
 
 
 
