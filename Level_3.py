@@ -1,5 +1,4 @@
 # Import
-import math
 import pygame, random, time, sys
 import GameObjects
 import csv
@@ -12,20 +11,20 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = int(SCREEN_WIDTH * 0.8)
 
 #defining level (starting with level 1 for testing)
-level = 1
-rows1 = 16
+level = 3
+rows1 = 150
 TILE_TYPES = 21
 TILE_SIZE = SCREEN_HEIGHT // rows1
-cols1 = 150
+cols1 = 20
 SCROLL_THRESH = 200
 screen_scroll = 0
 bg_scroll = 0
 
 #loading the background
-ninja_forest = pygame.image.load('assets/backgrounds/ninja_forest_background.png')
-original_width, original_height = ninja_forest.get_size()
+jungle_forest = pygame.image.load('assets/backgrounds/jungle_forest_background.jpg')
+original_width, original_height = jungle_forest.get_size()
 new_width = int(SCREEN_HEIGHT * (original_width / original_height))
-ninja_forest = pygame.transform.scale(ninja_forest, (new_width, SCREEN_HEIGHT))
+jungle_forest = pygame.transform.scale(jungle_forest, (new_width, SCREEN_HEIGHT))
 
 #making list for different blocks in the game
 img_list = []
@@ -59,8 +58,6 @@ class Ninja(pygame.sprite.Sprite):
         img = pygame.image.load('Sprites/ninja_hero_sprite.png')
         health = pygame.image.load('Sprites/temp_healthbar.jpg')
         self.image = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))
-        #crop the image 5 pixels from the bottom
-        self.image = self.image.subsurface(5,0,self.image.get_width()-14,self.image.get_height()-20)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
 
@@ -183,20 +180,9 @@ class EnemyNinja(pygame.sprite.Sprite):
         self.idling_counter = 0
 
         img = pygame.image.load('Assets/Ninja/ninja_hero_sprite_orange.png')
-        self.image = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))   
-        self.image = self.image.subsurface(5,0,self.image.get_width()-14,self.image.get_height()-20)      
-        self.rect = self.image.get_rect() 
-        self.rect.center = (x, y) 
-
-    #class that throws 1 star from the enemy ninja of GameObjects.py EnemyStar class
-    def throw_star(self):
-        #throw one star surface
-        star = GameObjects.EnemyStar(self.rect.centerx + (0.5 * self.rect.size[0] * self.direction), self.rect.centery, self.direction)
-        return star
-    
-    
-
-
+        self.image = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
 
     def update(self):
         self.dead()
@@ -293,7 +279,7 @@ class World():
                     if tile >= 0 and tile <= 8:
                         self.obstacle_list.append(tile_data)
                     elif tile == 15:  # create player
-                        ninja = Ninja('ninja', x * TILE_SIZE, y * TILE_SIZE, 15, 7)
+                        ninja = Ninja('ninja', x * TILE_SIZE, y * TILE_SIZE, 100, 7)
                         healthbar = GameObjects.HealthBar(20,20,ninja.health,ninja.health)
                     elif tile == 16: # create enemy
                         enemy = EnemyNinja(x * TILE_SIZE, y * TILE_SIZE, 15,7)
@@ -325,9 +311,9 @@ red = (255,0,0)
 
 def draw_bg():
     screen.fill(BG)
-    width = ninja_forest.get_width()
+    width = jungle_forest.get_width()
     for x in range(5):
-        screen.blit(ninja_forest, ((x * width) - bg_scroll * 0.5, 0))
+        screen.blit(jungle_forest, ((x * width) - bg_scroll * 0.5, 0))
 
 
 enemy_ninja_group = pygame.sprite.Group()
@@ -363,16 +349,6 @@ with open(f'level{level}_data.csv', newline='') as csvfile:
 world = World()
 ninja, healthbar = world.process_data(world_data)            
 
-#method to find enemy closest to player
-def find_closest_enemy(ninja):
-    closest_enemy = enemy_ninja_group.sprites()[0]
-    for enemy in enemy_ninja_group:
-        if abs(enemy.rect.x - ninja.rect.x) < abs(closest_enemy.rect.x - ninja.rect.x):
-            closest_enemy = enemy
-    return closest_enemy
-
-
-
 
 run = True
 # Game loop
@@ -393,14 +369,10 @@ while run:
         enemy.draw(screen)
         enemy.update()
 
-<<<<<<< HEAD
-   
-=======
     #draw exit on screen
     exit_group.update()
     exit_group.draw(screen)
  
->>>>>>> 065f869a06252a13152f47a64995b27023152be1
 
     if ninja.alive:
         screen_scroll, level_complete = ninja.move(moving_left, moving_right)
@@ -428,48 +400,12 @@ while run:
                 moving_right= True
             if event.key == pygame.K_UP and ninja.alive:
                 ninja.jump = True
-            if event.key == pygame.K_p:
-                # Play punch sound effect
-                #punch_sound.play()
-
-                # Calculate the distance between the hero and the enemy closest to the hero using pythagoras theorem and find_closest_enemy function
-                distance = math.sqrt((ninja.rect.x - find_closest_enemy(ninja).rect.x)**2 + (ninja.rect.y - find_closest_enemy(ninja).rect.y)**2)
-
-                # If the distance is less than 200 pixels, the enemy is close enough to punch
-                if distance < 80:
-                    # Punch the enemy
-                    find_closest_enemy(ninja).health -= 10
-
-                    # If the enemy's health is less than or equal to 0, kill the enemy
-                    if find_closest_enemy(ninja).health <= 0:
-                        find_closest_enemy(ninja).alive = False
-                        find_closest_enemy(ninja).kill()
-
-                    # Draw the punch sprite to last for 0.5s but 10x smaller (Sprites/hero_punch.png) at the enemies's position
-                    punch_sprite = pygame.image.load('Sprites/hero_punch.png')
-                    punch_sprite = pygame.transform.scale(punch_sprite, (int(punch_sprite.get_width()/10), int(punch_sprite.get_height()/10)))
-                    #make the punch sprite appear at the enemy's position for 0.5s
-                    screen.blit(punch_sprite, (find_closest_enemy(ninja).rect.x, find_closest_enemy(ninja).rect.y))
-                    pygame.display.update()
-                    pygame.time.delay(500)
-                
-
-        #enemy star throw if the enemy is alive and the enemy is close enough to the hero
-        for enemy in enemy_ninja_group:
-            if enemy.alive and abs(enemy.rect.x - ninja.rect.x) < 400:
-                # Throw the star at the hero of type pygame.surface.Surface not EnemyStar
-                screen.blit(enemy.throw_star(), (enemy.rect.x, enemy.rect.y))
-                pygame.time.delay(500)
-                
-
-        
         #keyboard release
         if event.type == pygame.KEYUP:
            if event.key == pygame.K_LEFT:
                moving_left = False
            if event.key == pygame.K_RIGHT:
                moving_right= False       
-    
     
 
     pygame.display.update()
