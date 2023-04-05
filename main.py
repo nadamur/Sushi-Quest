@@ -159,8 +159,7 @@ class World():
                     elif tile == 15:  # create player
                         ninja = Ninja('ninja', x * TILE_SIZE, y * TILE_SIZE, 15, 7)
                     elif tile == 16: # create enemy
-                        self.obstacle_list.append(tile_data)
-                        enemy = Ninja('enemy', x * TILE_SIZE, y * TILE_SIZE, 15, 7)
+                        enemy = GameObjects.EnemyNinja(x * TILE_SIZE, y * TILE_SIZE, 15)
                         enemy_ninja_group.add(enemy)
                     
         return ninja
@@ -246,7 +245,6 @@ while run:
     for enemy in enemy_ninja_group:
         enemy.draw(screen)
         enemy.update()
-        enemy.ai()
 
 
     if ninja.alive:
