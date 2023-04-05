@@ -94,7 +94,7 @@ def draw_starting_screen(mouse_pos):
     return button_rect
 
 
-# ----------------------- Create Button Function -------------------------
+# ----------------------- Create Button Function -------------------
 def create_button(text, pos, text_color=WHITE, border_color=BLACK, padding=10, border_width=0, font_path="Fonts/COMIC.TTF", font_size=30):
     button_font = pygame.font.Font(font_path, font_size)
     button_text = button_font.render(text, True, text_color)
@@ -261,13 +261,12 @@ def main():
                 if continue_button.collidepoint(event.pos):
                     background_page = False
 
-    # Character customization variables
+    # Character customization loop
     global selected_color
     customization_screen = True
     input_text = "Ninja"
     name = "Ninja"
     active = True
-    # Character customization loop
     while customization_screen and run:
         input_rect = draw_characterCustomization(selected_color, input_text, name)
         for event in pygame.event.get():
@@ -292,6 +291,14 @@ def main():
             #         active = not active
             #     else:
             #         active = False
+
+    # 
+
+
+
+
+
+
              
     pygame.quit()
 
