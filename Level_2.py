@@ -526,7 +526,7 @@ getReadyText = 'Get Ready for Phase 1!'
 pygame.time.set_timer(pygame.USEREVENT,1000)
 fontNum = pygame.font.SysFont('Consolas',100)
 fontText = pygame.font.SysFont('Consolas',50)
-fontScore = pygame.font.SysFont('Condolas',20)
+fontScore = pygame.font.SysFont('Condolas',35)
 hero_group = pygame.sprite.Group()
 hero_group.add(ninja)
 
@@ -535,10 +535,6 @@ x = 0
 level1_done = False
 level2_done = False
 level3_done = False
-level1_intro_done = False
-level2_intro_done = False
-level3_intro_done = False
-move_on = False
 reset_counter_2 = True
 reset_counter_3 = True
 
@@ -553,7 +549,7 @@ while run:
         world.draw()
         sc = round(score2)
         s = str(sc)
-        screen.blit(fontScore.render("Score: " + s,True,(255,0,0)),(50,50))
+        screen.blit(fontScore.render("Score: " + s,True,(255,0,0)),(20,50))
         if ninja.alive:
             score2 += score_increment
     
@@ -718,6 +714,8 @@ while run:
                 level2_done = False
                 level_done = False
                 ninja, healthbar = world.process_data(world_data)
+                x = 0
+                ninja.alive == True
                 
 
     

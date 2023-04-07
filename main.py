@@ -20,6 +20,9 @@ cols1 = 150
 SCROLL_THRESH = 200
 screen_scroll = 0
 bg_scroll = 0
+score1 = 0
+score_increment = 0.05
+fontScore = pygame.font.SysFont('Condolas',35)
 
 #loading the background
 ninja_forest = pygame.image.load('assets/backgrounds/ninja_forest_background.png')
@@ -101,7 +104,7 @@ class Ninja(pygame.sprite.Sprite):
             self.direction = 0.75
 
         #jumping
-        if self.jump == True and self.jump_counter < 2:
+        if self.jump == True and self.jump_counter < 1:
             self.vel_y = -14
             self.jump = False
             self.jump_counter +=1
@@ -404,6 +407,11 @@ while run:
     clock.tick(FPS)
     draw_bg()
     world.draw()
+    sc = round(score1)
+    s = str(sc)
+    screen.blit(fontScore.render("Score: " + s,True,(255,0,0)),(20,50))
+    if ninja.alive:
+        score1 += score_increment
    
     # commenting out the enemy for now
     healthbar.draw(ninja.health,screen)
