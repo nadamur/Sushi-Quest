@@ -64,6 +64,7 @@ class Ninja(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
 
+                                
     def update(self):
         self.dead()
 
@@ -77,11 +78,14 @@ class Ninja(pygame.sprite.Sprite):
     def draw(self,screen):
         screen.blit(pygame.transform.flip(self.image,self.flip,False),self.rect)
 
-    def ai(self):
-            if self.alive and ninja.alive:
-                if self.idling == False and random.randint(1,200) == 1:
-                    self.idling = True
-
+    def throw(self):
+        if self.throw == 0 and self.ammo > 0:
+            self.throw = 20
+            star = Star(self.rect.centerx + (0.75 * self.rect.size[0] * self.direction), self.rect.centery, self.direction)
+            star_group.add(star)
+            #reduce ammo
+            self.ammo -= 1
+            
     def move(self, moving_left,moving_right):
         screen_scroll = 0
         dx = 0
@@ -125,22 +129,9 @@ class Ninja(pygame.sprite.Sprite):
                     self.vel_y = 0
                     self.jump_counter = 0
 
-
-                #check for collision with exit
-        level_complete = False
-        if pygame.sprite.spritecollide(self, exit_group, False):
-            level_complete = True
-
         #check if going off the edges of the screen
         if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
             dx = 0
-
-
-        #check if falling off the edge of the screen
-        if self.rect.bottom > SCREEN_HEIGHT:
-            self.health = 0
-            self.speed = 0
-            self.alive = False
 
         #update rectangle position
         self.rect.x += dx
@@ -153,16 +144,63 @@ class Ninja(pygame.sprite.Sprite):
                 self.rect.x -= dx
                 screen_scroll = -dx
 
-        return screen_scroll, level_complete
+        return screen_scroll
     
-    def ai(self,ninja):
-        if self.alive and ninja.alive:
-            if self.idling == False and random.randint(1,200) == 1:
+    def ai(self):
+         if self.alive and ninja.alive:
+            if self.idling == False and random.randint(1, 200) == 1:
+                self.update_action(0)#0: idle
                 self.idling = True
                 self.idling_counter = 50
-            # if self.vision.colliderect(ninja.rect):
-            #     self.throw_star(sprite_group)
+			#check if the ai in near the player
+            if self.vision.colliderect(ninja.rect):
+				#stop running and face the player
+                self.update_action(0)#0: idle
+				#throw
+                self.throw()
+            else:
+                if self.idling == False:
+                    if self.direction == 1:
+                        ai_moving_right = True
+                    else:
+                        ai_moving_right = False
+                    ai_moving_left = not ai_moving_right
+                    self.move(ai_moving_left, ai_moving_right)
+                    self.update_action(1)#1: run
+                    self.move_counter += 1
+					#update ai vision as the enemy moves
+                    self.vision.center = (self.rect.centerx + 75 * self.direction, self.rect.centery)
+                    
+                    if self.move_counter > TILE_SIZE:
+                        self.direction *= -1
+                        self.move_counter *= -1
+                else:
+                    self.idling_counter -= 1
+                    if self.idling_counter <= 0:
+                        self.idling = False
 
+class Star(pygame.sprite.Sprite):
+	def __init__(self, x, y, direction):
+		pygame.sprite.Sprite.__init__(self)
+		self.speed = 10
+		self.image = star_img
+		self.rect = self.image.get_rect()
+		self.rect.center = (x, y)
+		self.direction = direction
+
+	def update(self):
+		#move star
+		self.rect.x += (self.direction * self.speed)
+		#check if star has gone off screen
+		if self.rect.right < 0 or self.rect.left > SCREEN_WIDTH:
+			self.kill()
+
+		#check collision with character
+		if pygame.sprite.spritecollide(ninja, star_group, False):
+			if ninja.alive:
+				ninja.health -= 5
+				self.kill()
+                                        
 class EnemyNinja(pygame.sprite.Sprite):
     def __init__(self, x, y, scale,speed):
         pygame.sprite.Sprite.__init__(self)
@@ -189,19 +227,20 @@ class EnemyNinja(pygame.sprite.Sprite):
         self.rect.center = (x, y) 
 
     #class that throws 1 star from the enemy ninja of GameObjects.py EnemyStar class
-    def throw_star(self):
+    #def throw_star(self):
         #throw one star surface
-        star = GameObjects.EnemyStar(self.rect.centerx + (0.5 * self.rect.size[0] * self.direction), self.rect.centery, self.direction)
-        return star
-    
+     #   star = GameObjects.EnemyStar(self.rect.centerx + (0.5 * self.rect.size[0] * self.direction), self.rect.centery, self.direction)
+            
     
 
 
 
     def update(self):
-        self.dead()
+        #self.update_animation()
+        self.is_alive()
 
-    def dead(self):
+
+    def is_alive(self):
         if self.health <=0:
             self.health = 0
             self.speed = 0
@@ -242,7 +281,7 @@ class EnemyNinja(pygame.sprite.Sprite):
                     dy = tile[1].top - self.rect.bottom
                     self.vel_y = 0
                     self.jump_counter = 0
-        
+
         #check if going off the edges of the screen
         if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
             dx = 0
@@ -254,9 +293,9 @@ class EnemyNinja(pygame.sprite.Sprite):
     
     def ai(self,ninja):
         if self.alive and ninja.alive:
-            if self.idling == False and random.randint(1,200) == 1:
-                self.idling = True
-                self.idling_counter = 50
+            if self.idling == False and random.randint(1,200) == 1: 
+                self.idling = True 
+                self.idling_counter = 50 
             # if self.vision.colliderect(ninja.rect):
             # #     self.throw_star(sprite_group)
             # else:
@@ -264,16 +303,6 @@ class EnemyNinja(pygame.sprite.Sprite):
             #         if self.direction ==1:
             self.move()
 
-#creating exit from world
-class Exit(pygame.sprite.Sprite):
-	def __init__(self, img, x, y):
-		pygame.sprite.Sprite.__init__(self)
-		self.image = img
-		self.rect = self.image.get_rect()
-		self.rect.midtop = (x + TILE_SIZE // 2, y + (TILE_SIZE - self.image.get_height()))
-
-	def update(self):
-		self.rect.x += screen_scroll
 
 #creating the world
 class World():
@@ -298,9 +327,6 @@ class World():
                     elif tile == 16: # create enemy
                         enemy = EnemyNinja(x * TILE_SIZE, y * TILE_SIZE, 15,7)
                         enemy_ninja_group.add(enemy)
-                    elif tile == 20:
-                        exit = Exit(img, x * TILE_SIZE, y * TILE_SIZE)
-                        exit_group.add(exit)
                     
         return ninja, healthbar
 
@@ -331,7 +357,7 @@ def draw_bg():
 
 
 enemy_ninja_group = pygame.sprite.Group()
-exit_group = pygame.sprite.Group()
+
 star_group = pygame.sprite.Group()
 
 # creating enemies
@@ -362,7 +388,7 @@ with open(f'level{level}_data.csv', newline='') as csvfile:
             world_data[x][y] = int(tile)
 world = World()
 ninja, healthbar = world.process_data(world_data)            
-
+star_img = pygame.image.load('Sprites/star.png').convert_alpha()
 #method to find enemy closest to player
 def find_closest_enemy(ninja):
     closest_enemy = enemy_ninja_group.sprites()[0]
@@ -370,9 +396,6 @@ def find_closest_enemy(ninja):
         if abs(enemy.rect.x - ninja.rect.x) < abs(closest_enemy.rect.x - ninja.rect.x):
             closest_enemy = enemy
     return closest_enemy
-
-
-
 
 run = True
 # Game loop
@@ -393,26 +416,17 @@ while run:
         enemy.draw(screen)
         enemy.update()
 
-    #draw exit on screen
-    exit_group.update()
-    exit_group.draw(screen)
- 
+   #update and draw groups
+    star_group.update()
+    star_group.draw(screen)
+        
 
     if ninja.alive:
-        screen_scroll, level_complete = ninja.move(moving_left, moving_right)
+        screen_scroll = ninja.move(moving_left,moving_right)
         bg_scroll -= screen_scroll
-    else:
-        run = False
 
-    if level_complete:
-        #exit the game for now until we have transition
-        run = False
-
-    #star collision logic
-    # star_collisions = pygame.sprite.groupcollide(star_group,ninja,True,False)
-    # for star in star_collisions:
-    #     star_hit()
-    #game logic
+    
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
@@ -448,14 +462,7 @@ while run:
                     screen.blit(punch_sprite, (find_closest_enemy(ninja).rect.x, find_closest_enemy(ninja).rect.y))
                     pygame.display.update()
                     pygame.time.delay(500)
-                
-
-        #enemy star throw if the enemy is alive and the enemy is close enough to the hero
-        for enemy in enemy_ninja_group:
-            if enemy.alive and abs(enemy.rect.x - ninja.rect.x) < 400:
-                # Throw the star at the hero of type pygame.surface.Surface not EnemyStar
-                screen.blit(enemy.throw_star(), (enemy.rect.x, enemy.rect.y))
-                pygame.time.delay(500)
+            
                 
 
         
