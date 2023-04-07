@@ -24,10 +24,9 @@ MAX_PLATFORMS = 50
 scroll = 0
 bg_scroll = 0
 game_over = False
-score = 0
+score3 = 0
 fade_counter = 0
 fontScore = pygame.font.SysFont('Condolas',20)
-score = 0
 score_increment = 0.05
 
 
@@ -74,6 +73,7 @@ class Ninja():
 		self.rect.center = (x, y)
 		self.vel_y = 0
 		self.flip = False
+		self.jump = False
 
 	def move(self):
 		#reset variables
@@ -90,7 +90,10 @@ class Ninja():
 			dx = 8
 			self.flip = False
 		if key[pygame.K_UP]:
-			self.vel_y = -15
+			if self.jump == False:
+				self.vel_y = -20
+				self.jump = True
+			
 
 		#gravity
 		self.vel_y += GRAVITY
@@ -113,6 +116,7 @@ class Ninja():
 						self.rect.bottom = platform.rect.top
 						dy = 0
 						self.vel_y = 0
+						self.jump = False
 						
         #check if the player has bounced to the top or bottom of the screen
 		if self.rect.top <= SCROLL_THRESH:
@@ -209,8 +213,8 @@ while run:
 
 	if game_over == False:
 		scroll = ninja.move()
-		score += score_increment
-		sc = round(score)
+		score3 += score_increment
+		sc = round(score3)
 		s = str(sc)
 		screen.blit(fontScore.render("Score: " + s,True,(255,0,0)),(50,50))
 
