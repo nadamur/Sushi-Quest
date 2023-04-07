@@ -1,1 +1,1 @@
-s
+level1_intro_done = True
