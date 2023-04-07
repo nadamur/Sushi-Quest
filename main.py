@@ -125,22 +125,9 @@ class Ninja(pygame.sprite.Sprite):
                     self.vel_y = 0
                     self.jump_counter = 0
 
-
-                #check for collision with exit
-        level_complete = False
-        if pygame.sprite.spritecollide(self, exit_group, False):
-            level_complete = True
-
         #check if going off the edges of the screen
         if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
             dx = 0
-
-
-        #check if falling off the edge of the screen
-        if self.rect.bottom > SCREEN_HEIGHT:
-            self.health = 0
-            self.speed = 0
-            self.alive = False
 
         #update rectangle position
         self.rect.x += dx
@@ -153,7 +140,7 @@ class Ninja(pygame.sprite.Sprite):
                 self.rect.x -= dx
                 screen_scroll = -dx
 
-        return screen_scroll, level_complete
+        return screen_scroll
     
     def ai(self,ninja):
         if self.alive and ninja.alive:
@@ -192,8 +179,7 @@ class EnemyNinja(pygame.sprite.Sprite):
     def throw_star(self):
         #throw one star surface
         star = GameObjects.EnemyStar(self.rect.centerx + (0.5 * self.rect.size[0] * self.direction), self.rect.centery, self.direction)
-        return star
-    
+            
     
 
 
@@ -242,7 +228,7 @@ class EnemyNinja(pygame.sprite.Sprite):
                     dy = tile[1].top - self.rect.bottom
                     self.vel_y = 0
                     self.jump_counter = 0
-        
+
         #check if going off the edges of the screen
         if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
             dx = 0
@@ -264,16 +250,6 @@ class EnemyNinja(pygame.sprite.Sprite):
             #         if self.direction ==1:
             self.move()
 
-#creating exit from world
-class Exit(pygame.sprite.Sprite):
-	def __init__(self, img, x, y):
-		pygame.sprite.Sprite.__init__(self)
-		self.image = img
-		self.rect = self.image.get_rect()
-		self.rect.midtop = (x + TILE_SIZE // 2, y + (TILE_SIZE - self.image.get_height()))
-
-	def update(self):
-		self.rect.x += screen_scroll
 
 #creating the world
 class World():
@@ -298,9 +274,6 @@ class World():
                     elif tile == 16: # create enemy
                         enemy = EnemyNinja(x * TILE_SIZE, y * TILE_SIZE, 15,7)
                         enemy_ninja_group.add(enemy)
-                    elif tile == 20:
-                        exit = Exit(img, x * TILE_SIZE, y * TILE_SIZE)
-                        exit_group.add(exit)
                     
         return ninja, healthbar
 
@@ -331,7 +304,8 @@ def draw_bg():
 
 
 enemy_ninja_group = pygame.sprite.Group()
-exit_group = pygame.sprite.Group()
+
+
 star_group = pygame.sprite.Group()
 
 # creating enemies
@@ -393,20 +367,12 @@ while run:
         enemy.draw(screen)
         enemy.update()
 
-    #draw exit on screen
-    exit_group.update()
-    exit_group.draw(screen)
- 
+   
 
     if ninja.alive:
-        screen_scroll, level_complete = ninja.move(moving_left, moving_right)
+        screen_scroll = ninja.move(moving_left,moving_right)
         bg_scroll -= screen_scroll
-    else:
-        run = False
 
-    if level_complete:
-        #exit the game for now until we have transition
-        run = False
 
     #star collision logic
     # star_collisions = pygame.sprite.groupcollide(star_group,ninja,True,False)
