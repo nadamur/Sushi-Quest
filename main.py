@@ -214,6 +214,8 @@ class EnemyNinja(pygame.sprite.Sprite):
         self.distance = 200
         self.attack_distance = 50
         self.is_throwing_stars = False
+        self.flip = False
+        self.health = 10
     
     def update(self, ninja):
         dx, dy = ninja.rect.x - self.rect.x, ninja.rect.y - self.rect.y
@@ -433,7 +435,7 @@ while run:
 
     #draw enemies on screen
     for enemy in enemy_ninja_group:
-        enemy.ai(enemy)
+        # enemy.ai(enemy)
         enemy.draw(screen)
         enemy.update()
 
