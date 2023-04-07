@@ -7,8 +7,8 @@ import os
 pygame.init()
 
 #game window dimensions
-SCREEN_WIDTH = 500
-SCREEN_HEIGHT = 816
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 600
 #create game window
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Level 3')
@@ -20,7 +20,7 @@ FPS = 60
 #game variables
 SCROLL_THRESH = 200
 GRAVITY = 0.5
-MAX_PLATFORMS = 40
+MAX_PLATFORMS = 50
 scroll = 0
 bg_scroll = 0
 game_over = False
@@ -43,10 +43,11 @@ bg_image = pygame.image.load('Assets/Backgrounds/jungle_forest_background.jpg').
 platform_image = pygame.image.load('Assets/Sprites/wood.png').convert_alpha()
 
 
-# #function for outputting text onto the screen
-# def draw_text(text, font, text_col, x, y):
-# 	img = font.render(text, True, text_col)
-# 	screen.blit(img, (x, y))
+
+#function for outputting text onto the screen
+def draw_text(text, font, text_col, x, y):
+	img = font.render(text, True, text_col)
+	screen.blit(img, (x, y))
 
 # #function for drawing info panel
 # def draw_panel():
@@ -66,7 +67,7 @@ class Ninja():
 		self.image = pygame.transform.scale(ninja_image, (45, 45))
 		self.width = 25
 		self.height = 40
-		self.rect = pygame.Rect(0, 0, self.width, self.height)
+		self.rect = pygame.Rect(0, 0, self.width, self.height-10)
 		self.rect.center = (x, y)
 		self.vel_y = 0
 		self.flip = False
@@ -86,7 +87,7 @@ class Ninja():
 			dx = 8
 			self.flip = False
 		if key[pygame.K_UP]:
-			self.vel_y = -10
+			self.vel_y = -15
 
 		#gravity
 		self.vel_y += GRAVITY
@@ -115,10 +116,10 @@ class Ninja():
 			#if player is jumping
 			if self.vel_y < 0:
 				scroll = -dy
-		elif self.rect.bottom >= SCREEN_HEIGHT - SCROLL_THRESH:
-			#if player is falling
-			if self.vel_y > 0:
-				scroll = -(self.rect.bottom - SCREEN_HEIGHT + SCROLL_THRESH)
+		# elif self.rect.bottom >= SCREEN_HEIGHT - SCROLL_THRESH:
+		# 	#if player is falling
+		# 	if self.vel_y > 0:
+		# 		scroll = -(self.rect.bottom - SCREEN_HEIGHT + SCROLL_THRESH)
         
 		#update rectangle position
 		self.rect.x += dx
@@ -159,6 +160,10 @@ class Platform(pygame.sprite.Sprite):
 		#update platform's vertical position
 		self.rect.y += scroll
 
+		#check if platform has gone off the screen
+		if self.rect.top > SCREEN_HEIGHT:
+			self.kill()
+
 		
 
 
@@ -172,6 +177,7 @@ enemy_group = pygame.sprite.Group()
 #create starting platform
 platform = Platform(0, SCREEN_HEIGHT - 50, SCREEN_WIDTH, False)
 platform_group.add(platform)
+last_platform = None
 
 for p in range(MAX_PLATFORMS):
     p_w = random.randint(50, 60)
@@ -183,6 +189,13 @@ for p in range(MAX_PLATFORMS):
         p_moving = True
     platform = Platform(p_x, p_y, p_w, p_moving)
     platform_group.add(platform)
+    last_platform = platform
+    
+# create final platform
+final_platform = Platform(random.randint(0, SCREEN_WIDTH - p_w), last_platform.rect.y - random.randint(80, 120), p_w, False)
+platform_group.add(final_platform)
+
+
 
 #game loop
 run = True
@@ -193,10 +206,6 @@ while run:
 	if game_over == False:
 		scroll = ninja.move()
 
-		#draw background
-		bg_scroll += scroll
-		if bg_scroll >= 100:
-			bg_scroll = 0
 		draw_bg(bg_scroll)
 
 		#generate platforms
@@ -204,69 +213,48 @@ while run:
 		#update platforms
 		platform_group.update(scroll)
 
-		# #generate enemies
-		# if len(enemy_group) == 0 and score > 1500:
-		# 	enemy = Enemy(SCREEN_WIDTH, 100, bird_sheet, 1.5)
-		# 	enemy_group.add(enemy)
-
-		# #update enemies
-		# enemy_group.update(scroll, SCREEN_WIDTH)
-
-		# #update score
-		# if scroll > 0:
-		# 	score += scroll
-
-		# #draw line at previous high score
-		# pygame.draw.line(screen, WHITE, (0, score - high_score + SCROLL_THRESH), (SCREEN_WIDTH, score - high_score + SCROLL_THRESH), 3)
-		# draw_text('HIGH SCORE', font_small, WHITE, SCREEN_WIDTH - 130, score - high_score + SCROLL_THRESH)
-
 		#draw sprites
 		platform_group.draw(screen)
 		enemy_group.draw(screen)
 		ninja.draw()
 
-		# #draw panel
-		# draw_panel()
-
-		# #check game over
-		# if jumpy.rect.top > SCREEN_HEIGHT:
-		# 	game_over = True
-		# #check for collision with enemies
-		# if pygame.sprite.spritecollide(jumpy, enemy_group, False):
-		# 	if pygame.sprite.spritecollide(jumpy, enemy_group, False, pygame.sprite.collide_mask):
-		# 		game_over = True
-	# else:
-	# 	if fade_counter < SCREEN_WIDTH:
-	# 		fade_counter += 5
-	# 		for y in range(0, 6, 2):
-	# 			pygame.draw.rect(screen, BLACK, (0, y * 100, fade_counter, 100))
-	# 			pygame.draw.rect(screen, BLACK, (SCREEN_WIDTH - fade_counter, (y + 1) * 100, SCREEN_WIDTH, 100))
-	# 	else:
-	# 		draw_text('GAME OVER!', font_big, WHITE, 130, 200)
-	# 		draw_text('SCORE: ' + str(score), font_big, WHITE, 130, 250)
-	# 		draw_text('PRESS SPACE TO PLAY AGAIN', font_big, WHITE, 40, 300)
-	# 		#update high score
-	# 		if score > high_score:
-	# 			high_score = score
-	# 			with open('score.txt', 'w') as file:
-	# 				file.write(str(high_score))
-	# 		key = pygame.key.get_pressed()
-	# 		if key[pygame.K_SPACE]:
-	# 			#reset variables
-	# 			game_over = False
-	# 			score = 0
-	# 			scroll = 0
-	# 			fade_counter = 0
-	# 			#reposition jumpy
-	# 			jumpy.rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT - 150)
-	# 			#reset enemies
-	# 			enemy_group.empty()
-	# 			#reset platforms
-	# 			platform_group.empty()
-	# 			#create starting platform
-	# 			platform = Platform(SCREEN_WIDTH // 2 - 50, SCREEN_HEIGHT - 50, 100, False)
-	# 			platform_group.add(platform)
-
+		#check game over
+		if ninja.rect.top > SCREEN_HEIGHT:
+			game_over = True
+		#check for collision with enemies
+	else:
+		if fade_counter < SCREEN_WIDTH:
+			fade_counter += 5
+			for y in range(0, 6, 2):
+				pygame.draw.rect(screen, BLACK, (0, y * 100, fade_counter, 100))
+				pygame.draw.rect(screen, BLACK, (SCREEN_WIDTH - fade_counter, (y + 1) * 100, SCREEN_WIDTH, 100))
+		else:
+			draw_text('Game Over!', font_big, WHITE, 220, 200)
+			draw_text('Press space to try again', font_big, WHITE, 150, 300)
+			#update high score
+			key = pygame.key.get_pressed()
+			if key[pygame.K_SPACE]:
+				#reset variables
+				game_over = False
+				scroll = 0
+				fade_counter = 0
+				#reposition ninja
+				ninja.rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT - 150)
+				#reset platforms
+				platform_group.empty()
+				#create starting platform
+				platform = Platform(0, SCREEN_HEIGHT - 50, SCREEN_WIDTH, False)
+				platform_group.add(platform)
+				for p in range(MAX_PLATFORMS):
+					p_w = random.randint(50, 60)
+					p_x = random.randint(0, SCREEN_WIDTH - p_w)
+					p_y = platform.rect.y - random.randint(80, 120)
+					p_type = random.choices([1, 2], weights=[0.2, 0.8])[0] # Randomly choose between 1 and 2 with 20% and 80% probability respectively
+					p_moving = False
+					if p_type == 1:
+						p_moving = True
+					platform = Platform(p_x, p_y, p_w, p_moving)
+					platform_group.add(platform)
 
 	#event handler
 	for event in pygame.event.get():
