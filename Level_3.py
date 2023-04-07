@@ -1,414 +1,288 @@
-# Import
-import pygame, random, time, sys
-import GameObjects
-import csv
+#import libraries
+import pygame
+import random
 import os
 
-# Creating the game objects 
+#initialise pygame
 pygame.init()
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = int(SCREEN_WIDTH * 0.8)
-
-#defining level (starting with level 1 for testing)
-level = 3
-rows1 = 150
-TILE_TYPES = 21
-TILE_SIZE = SCREEN_HEIGHT // rows1
-cols1 = 20
-SCROLL_THRESH = 200
-screen_scroll = 0
-bg_scroll = 0
-
-#loading the background
-jungle_forest = pygame.image.load('assets/backgrounds/jungle_forest_background.jpg')
-original_width, original_height = jungle_forest.get_size()
-new_width = int(SCREEN_HEIGHT * (original_width / original_height))
-jungle_forest = pygame.transform.scale(jungle_forest, (new_width, SCREEN_HEIGHT))
-
-#making list for different blocks in the game
-img_list = []
-for x in range(TILE_TYPES):
-    img = pygame.image.load(f'tile/{x}.png')
-    img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
-    img_list.append(img)
-    
-
-#creating the player
-class Ninja(pygame.sprite.Sprite):
-    def __init__(self, char_type,x, y, scale,speed):
-        pygame.sprite.Sprite.__init__(self)
-        self.alive = True
-        self.char_type = char_type
-        self.speed = speed
-        self.direction = 1
-        self.vel_y = 0
-        self.jump = False
-        self.flip = False
-        self.frame_index = 0
-        self.action = 0
-        self.health = 100
-        self.max_health = self.health
-        self.jump_counter = 0
-        self.update_time = pygame.time.get_ticks()
-        self.idling = False
-        self.idling_counter = 0
-        self.vision = pygame.Rect(0,0,150,640)
-
-        img = pygame.image.load('Sprites/ninja_hero_sprite.png')
-        health = pygame.image.load('Sprites/temp_healthbar.jpg')
-        self.image = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))
-        self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
-
-    def update(self):
-        self.dead()
-
-    def dead(self):
-        if self.health <=0:
-            self.health = 0
-            self.speed = 0
-            self.alive = False
-
-    
-    def draw(self,screen):
-        screen.blit(pygame.transform.flip(self.image,self.flip,False),self.rect)
-
-    def ai(self):
-            if self.alive and ninja.alive:
-                if self.idling == False and random.randint(1,200) == 1:
-                    self.idling = True
-
-    def move(self, moving_left,moving_right):
-        screen_scroll = 0
-        dx = 0
-        dy = 0
-
-        if moving_left:
-            dx = -self.speed
-            self.flip = True
-            self.direction = -.75
-        if moving_right:
-            dx = self.speed
-            self.flip = False
-            self.direction = 0.75
-
-        #jumping
-        if self.jump == True and self.jump_counter < 2:
-            self.vel_y = -14
-            self.jump = False
-            self.jump_counter +=1
-
-        #gravity
-        self.vel_y += 0.75
-        if self.vel_y>10:
-            self.vel_y
-        dy += self.vel_y
-
-        #collision check
-        for tile in world.obstacle_list:
-            #check collision in x direction
-            if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.rect.width, self.rect.height):
-                dx = 0
-            #check collision in y direction
-            if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.rect.width, self.rect.height):
-                #check if below the ground i.e. jumping
-                if self.vel_y < 0:
-                    dy = tile[1].bottom - self.rect.top
-                    self.vel_y = 0
-                #check if above the ground i.e. falling
-                elif self.vel_y >= 0:
-                    dy = tile[1].top - self.rect.bottom
-                    self.vel_y = 0
-                    self.jump_counter = 0
-
-
-                #check for collision with exit
-        level_complete = False
-        if pygame.sprite.spritecollide(self, exit_group, False):
-            level_complete = True
-
-        #check if going off the edges of the screen
-        if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
-            dx = 0
-
-
-        #check if falling off the edge of the screen
-        if self.rect.bottom > SCREEN_HEIGHT:
-            self.health = 0
-            self.speed = 0
-            self.alive = False
-
-        #update rectangle position
-        self.rect.x += dx
-        self.rect.y += dy
-
-        #update scroll based on player position
-        if self.char_type == 'ninja':
-            if (self.rect.right > SCREEN_WIDTH - SCROLL_THRESH and bg_scroll < (world.level_length * TILE_SIZE) - SCREEN_WIDTH)\
-            or (self.rect.left < SCROLL_THRESH and bg_scroll > abs(dx)):
-                self.rect.x -= dx
-                screen_scroll = -dx
-
-        return screen_scroll, level_complete
-    
-    def ai(self,ninja):
-        if self.alive and ninja.alive:
-            if self.idling == False and random.randint(1,200) == 1:
-                self.idling = True
-                self.idling_counter = 50
-            # if self.vision.colliderect(ninja.rect):
-            #     self.throw_star(sprite_group)
-
-class EnemyNinja(pygame.sprite.Sprite):
-    def __init__(self, x, y, scale,speed):
-        pygame.sprite.Sprite.__init__(self)
-        self.alive = True
-        self.vision = pygame.Rect(0,0,150,640)
-        self.speed = speed
-        self.direction = 1
-        self.vel_y = 0
-        self.jump = False
-        self.flip = False
-        self.frame_index = 0
-        self.action = 0
-        self.health = 100
-        self.max_health = self.health
-        self.jump_counter = 0
-        self.update_time = pygame.time.get_ticks()
-        self.idling = False
-        self.idling_counter = 0
-
-        img = pygame.image.load('Assets/Ninja/ninja_hero_sprite_orange.png')
-        self.image = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))
-        self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
-
-    def update(self):
-        self.dead()
-
-    def dead(self):
-        if self.health <=0:
-            self.health = 0
-            self.speed = 0
-            self.alive = False
-    
-    def draw(self,screen):
-        screen.blit(pygame.transform.flip(self.image,self.flip,False),self.rect)
-
-    def ai(self):
-            if self.alive and ninja.alive:
-                if self.idling == False and random.randint(1,200) == 1:
-                    self.idling = True
-
-    def move(self):
-        #screen_scroll = 0
-        dx = 0
-        dy = 0
-
-        #gravity
-        self.vel_y += 0.75
-        if self.vel_y>10:
-            self.vel_y
-        dy += self.vel_y
-
-        #collision check
-        for tile in world.obstacle_list:
-            #check collision in x direction
-            if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.rect.width, self.rect.height):
-                dx = 0
-            #check collision in y direction
-            if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.rect.width, self.rect.height):
-                #check if below the ground i.e. jumping
-                if self.vel_y < 0:
-                    dy = tile[1].bottom - self.rect.top
-                    self.vel_y = 0
-                #check if above the ground i.e. falling
-                elif self.vel_y >= 0:
-                    dy = tile[1].top - self.rect.bottom
-                    self.vel_y = 0
-                    self.jump_counter = 0
-        
-        #check if going off the edges of the screen
-        if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
-            dx = 0
-        #update rectangle position
-        self.rect.x += dx
-        self.rect.y += dy
-
-        return screen_scroll
-    
-    def ai(self,ninja):
-        if self.alive and ninja.alive:
-            if self.idling == False and random.randint(1,200) == 1:
-                self.idling = True
-                self.idling_counter = 50
-            # if self.vision.colliderect(ninja.rect):
-            # #     self.throw_star(sprite_group)
-            # else:
-            #     if self.idling == False:
-            #         if self.direction ==1:
-            self.move()
-
-#creating exit from world
-class Exit(pygame.sprite.Sprite):
-	def __init__(self, img, x, y):
-		pygame.sprite.Sprite.__init__(self)
-		self.image = img
-		self.rect = self.image.get_rect()
-		self.rect.midtop = (x + TILE_SIZE // 2, y + (TILE_SIZE - self.image.get_height()))
-
-	def update(self):
-		self.rect.x += screen_scroll
-
-#creating the world
-class World():
-    def __init__(self):
-        self.obstacle_list = []
-
-    def process_data(self, data):
-        self.level_length = len(data[0])
-        for y, row in enumerate(data):
-            for x, tile in enumerate(row):
-                if tile >= 0:
-                    img = img_list[tile]
-                    img_rect = img.get_rect()
-                    img_rect.x = x * TILE_SIZE
-                    img_rect.y = y * TILE_SIZE
-                    tile_data = (img, img_rect)
-                    if tile >= 0 and tile <= 8:
-                        self.obstacle_list.append(tile_data)
-                    elif tile == 15:  # create player
-                        ninja = Ninja('ninja', x * TILE_SIZE, y * TILE_SIZE, 100, 7)
-                        healthbar = GameObjects.HealthBar(20,20,ninja.health,ninja.health)
-                    elif tile == 16: # create enemy
-                        enemy = EnemyNinja(x * TILE_SIZE, y * TILE_SIZE, 15,7)
-                        enemy_ninja_group.add(enemy)
-                    elif tile == 20:
-                        exit = Exit(img, x * TILE_SIZE, y * TILE_SIZE)
-                        exit_group.add(exit)
-                    
-        return ninja, healthbar
-
-    def draw(self):
-        for tile in self.obstacle_list:
-            tile[1][0] += screen_scroll
-            screen.blit(tile[0], tile[1])
-
-    
-
-
+#game window dimensions
+SCREEN_WIDTH = 500
+SCREEN_HEIGHT = 800
+#create game window
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption('Level 3')
 
-pygame.display.set_caption('ninjagame')
+#set frame rate
 clock = pygame.time.Clock()
 FPS = 60
-moving_left = False
-moving_right = False
-BG = (144,201,100)
-red = (255,0,0)
+
+#game variables
+SCROLL_THRESH = 200
+GRAVITY = 0.75
+MAX_PLATFORMS = 10
+scroll = 0
+bg_scroll = 0
+game_over = False
+score = 0
+fade_counter = 0
 
 
-def draw_bg():
-    screen.fill(BG)
-    width = jungle_forest.get_width()
-    for x in range(5):
-        screen.blit(jungle_forest, ((x * width) - bg_scroll * 0.5, 0))
+#define colours
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+PANEL = (153, 217, 234)
+
+#define font
+font_small = pygame.font.SysFont('Lucida Sans', 20)
+font_big = pygame.font.SysFont('Lucida Sans', 24)
+
+#load images
+ninja_image = pygame.image.load('Assets/Sprites/ninja_hero_sprite.png').convert_alpha()
+bg_image = pygame.image.load('Assets/Backgrounds/jungle_forest_background.jpg').convert_alpha()
+platform_image = pygame.image.load('Assets/Sprites/wood.png').convert_alpha()
 
 
-enemy_ninja_group = pygame.sprite.Group()
-exit_group = pygame.sprite.Group()
-star_group = pygame.sprite.Group()
+# #function for outputting text onto the screen
+# def draw_text(text, font, text_col, x, y):
+# 	img = font.render(text, True, text_col)
+# 	screen.blit(img, (x, y))
 
-# creating enemies
-# enemy_ninjas_group = pygame.sprite.Group()
-
-
-# Game functions
-def star_hit(self):
-    if ninja.alive:
-        ninja.health -= 5
-        self.kill()
+# #function for drawing info panel
+# def draw_panel():
+# 	pygame.draw.rect(screen, PANEL, (0, 0, SCREEN_WIDTH, 30))
+# 	pygame.draw.line(screen, WHITE, (0, 30), (SCREEN_WIDTH, 30), 2)
+# 	draw_text('SCORE: ' + str(score), font_small, WHITE, 0, 0)
 
 
+#function for drawing the background
+def draw_bg(bg_scroll):
+	screen.blit(bg_image, (0, 0 + bg_scroll))
+	screen.blit(bg_image, (0, -600 + bg_scroll))
 
-# UI functions
+#player class
+class Ninja():
+	def __init__(self, x, y):
+		self.image = pygame.transform.scale(ninja_image, (45, 45))
+		self.width = 25
+		self.height = 40
+		self.rect = pygame.Rect(0, 0, self.width, self.height)
+		self.rect.center = (x, y)
+		self.vel_y = 0
+		self.flip = False
 
-#create empty tile list
-world_data = []
-for row in range(rows1):
-    r = [-1] * cols1
-    world_data.append(r)
+	def move(self):
+		#reset variables
+		scroll = 0
+		dx = 0
+		dy = 0
 
-#load in level data and create world
-with open(f'level{level}_data.csv', newline='') as csvfile:
-    reader = csv.reader(csvfile, delimiter=',')
-    for x, row in enumerate(reader):
-        for y, tile in enumerate(row):
-            world_data[x][y] = int(tile)
-world = World()
-ninja, healthbar = world.process_data(world_data)            
+		#process keypresses
+		key = pygame.key.get_pressed()
+		if key[pygame.K_LEFT]:
+			dx = -10
+			self.flip = True
+		if key[pygame.K_RIGHT]:
+			dx = 10
+			self.flip = False
+		if key[pygame.K_UP]:
+			self.vel_y = -15
+
+		#gravity
+		self.vel_y += GRAVITY
+		dy += self.vel_y
+
+		#ensure player doesn't go off the edge of the screen
+		if self.rect.left + dx < 0:
+			dx = -self.rect.left
+		if self.rect.right + dx > SCREEN_WIDTH:
+			dx = SCREEN_WIDTH - self.rect.right
 
 
+		#check collision with platforms
+		for platform in platform_group:
+			#collision in the y direction
+			if platform.rect.colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+				#check if above the platform
+				if self.rect.bottom < platform.rect.centery:
+					if self.vel_y > 0:
+						self.rect.bottom = platform.rect.top
+						dy = 0
+						
+        #check if the player has bounced to the top or bottom of the screen
+		if self.rect.top <= SCROLL_THRESH:
+			#if player is jumping
+			if self.vel_y < 0:
+				scroll = -dy
+		elif self.rect.bottom >= SCREEN_HEIGHT - SCROLL_THRESH:
+			#if player is falling
+			if self.vel_y > 0:
+				scroll = -(self.rect.bottom - SCREEN_HEIGHT + SCROLL_THRESH)
+        
+		#update rectangle position
+		self.rect.x += dx
+		self.rect.y += dy + scroll
+
+		#update mask
+		self.mask = pygame.mask.from_surface(self.image)
+
+		return scroll
+
+	def draw(self):
+		screen.blit(pygame.transform.flip(self.image, self.flip, False), (self.rect.x - 12, self.rect.y - 5))
+
+#platform class
+class Platform(pygame.sprite.Sprite):
+	def __init__(self, x, y, width, moving):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.transform.scale(platform_image, (width, 10))
+		self.moving = moving
+		self.move_counter = random.randint(0, 50)
+		self.direction = random.choice([-1, 1])
+		self.speed = random.randint(1, 2)
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
+
+	def update(self, scroll):
+		#moving platform side to side if it is a moving platform
+		if self.moving == True:
+			self.move_counter += 1
+			self.rect.x += self.direction * self.speed
+
+		#change platform direction if it has moved fully or hit a wall
+		if self.move_counter >= 100 or self.rect.left < 0 or self.rect.right > SCREEN_WIDTH:
+			self.direction *= -1
+			self.move_counter = 0
+
+		#update platform's vertical position
+		self.rect.y += scroll
+
+		#check if platform has gone off the screen
+		if self.rect.top > SCREEN_HEIGHT:
+			self.kill()
+
+#player instance
+ninja = Ninja(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 150)
+
+#create sprite groups
+platform_group = pygame.sprite.Group()
+enemy_group = pygame.sprite.Group()
+
+#create starting platform
+platform = Platform(SCREEN_WIDTH // 2 - 50, SCREEN_HEIGHT - 50, 100, False)
+platform_group.add(platform)
+
+#game loop
 run = True
-# Game loop
 while run:
-    #event loop
-    clock.tick(FPS)
-    draw_bg()
-    world.draw()
-   
-    # commenting out the enemy for now
-    healthbar.draw(ninja.health,screen)
-    ninja.update()
-    ninja.draw(screen)
 
-    #draw enemies on screen
-    for enemy in enemy_ninja_group:
-        enemy.ai(ninja)
-        enemy.draw(screen)
-        enemy.update()
+	clock.tick(FPS)
 
-    #draw exit on screen
-    exit_group.update()
-    exit_group.draw(screen)
- 
+	if game_over == False:
+		scroll = ninja.move()
 
-    if ninja.alive:
-        screen_scroll, level_complete = ninja.move(moving_left, moving_right)
-        bg_scroll -= screen_scroll
-    else:
-        run = False
+		#draw background
+		bg_scroll += scroll
+		if bg_scroll >= 600:
+			bg_scroll = 0
+		draw_bg(bg_scroll)
 
-    if level_complete:
-        #exit the game for now until we have transition
-        run = False
+		#generate platforms
+		if len(platform_group) < MAX_PLATFORMS:
+			p_w = random.randint(50, 60)
+			p_x = random.randint(0, SCREEN_WIDTH - p_w)
+			p_y = platform.rect.y - random.randint(80, 120)
+			p_type = random.randint(1, 2)
+			if p_type == 1 and score > 500:
+				p_moving = True
+			else:
+				p_moving = False
+			platform = Platform(p_x, p_y, p_w, p_moving)
+			platform_group.add(platform)
 
-    #star collision logic
-    # star_collisions = pygame.sprite.groupcollide(star_group,ninja,True,False)
-    # for star in star_collisions:
-    #     star_hit()
-    #game logic
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-        #keyboard press
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                moving_left = True
-            if event.key == pygame.K_RIGHT:
-                moving_right= True
-            if event.key == pygame.K_UP and ninja.alive:
-                ninja.jump = True
-        #keyboard release
-        if event.type == pygame.KEYUP:
-           if event.key == pygame.K_LEFT:
-               moving_left = False
-           if event.key == pygame.K_RIGHT:
-               moving_right= False       
-    
+		#update platforms
+		platform_group.update(scroll)
 
-    pygame.display.update()
-    #render
+		# #generate enemies
+		# if len(enemy_group) == 0 and score > 1500:
+		# 	enemy = Enemy(SCREEN_WIDTH, 100, bird_sheet, 1.5)
+		# 	enemy_group.add(enemy)
+
+		# #update enemies
+		# enemy_group.update(scroll, SCREEN_WIDTH)
+
+		# #update score
+		# if scroll > 0:
+		# 	score += scroll
+
+		# #draw line at previous high score
+		# pygame.draw.line(screen, WHITE, (0, score - high_score + SCROLL_THRESH), (SCREEN_WIDTH, score - high_score + SCROLL_THRESH), 3)
+		# draw_text('HIGH SCORE', font_small, WHITE, SCREEN_WIDTH - 130, score - high_score + SCROLL_THRESH)
+
+		#draw sprites
+		platform_group.draw(screen)
+		enemy_group.draw(screen)
+		ninja.draw()
+
+		# #draw panel
+		# draw_panel()
+
+		# #check game over
+		# if jumpy.rect.top > SCREEN_HEIGHT:
+		# 	game_over = True
+		# #check for collision with enemies
+		# if pygame.sprite.spritecollide(jumpy, enemy_group, False):
+		# 	if pygame.sprite.spritecollide(jumpy, enemy_group, False, pygame.sprite.collide_mask):
+		# 		game_over = True
+	# else:
+	# 	if fade_counter < SCREEN_WIDTH:
+	# 		fade_counter += 5
+	# 		for y in range(0, 6, 2):
+	# 			pygame.draw.rect(screen, BLACK, (0, y * 100, fade_counter, 100))
+	# 			pygame.draw.rect(screen, BLACK, (SCREEN_WIDTH - fade_counter, (y + 1) * 100, SCREEN_WIDTH, 100))
+	# 	else:
+	# 		draw_text('GAME OVER!', font_big, WHITE, 130, 200)
+	# 		draw_text('SCORE: ' + str(score), font_big, WHITE, 130, 250)
+	# 		draw_text('PRESS SPACE TO PLAY AGAIN', font_big, WHITE, 40, 300)
+	# 		#update high score
+	# 		if score > high_score:
+	# 			high_score = score
+	# 			with open('score.txt', 'w') as file:
+	# 				file.write(str(high_score))
+	# 		key = pygame.key.get_pressed()
+	# 		if key[pygame.K_SPACE]:
+	# 			#reset variables
+	# 			game_over = False
+	# 			score = 0
+	# 			scroll = 0
+	# 			fade_counter = 0
+	# 			#reposition jumpy
+	# 			jumpy.rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT - 150)
+	# 			#reset enemies
+	# 			enemy_group.empty()
+	# 			#reset platforms
+	# 			platform_group.empty()
+	# 			#create starting platform
+	# 			platform = Platform(SCREEN_WIDTH // 2 - 50, SCREEN_HEIGHT - 50, 100, False)
+	# 			platform_group.add(platform)
+
+
+	#event handler
+	for event in pygame.event.get():
+		if event.type == pygame.QUIT:
+			# #update high score
+			# if score > high_score:
+			# 	high_score = score
+			# 	with open('score.txt', 'w') as file:
+			# 		file.write(str(high_score))
+			run = False
+
+
+	#update display window
+	pygame.display.update()
+
+
 
 pygame.quit()
+
