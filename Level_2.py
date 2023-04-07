@@ -20,8 +20,14 @@ cols1 = 20
 SCROLL_THRESH = 200
 screen_scroll = 0
 bg_scroll = 0
-score = 0
+score2 = 0
 score_increment = 0.05
+fade_counter = 0
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+PANEL = (153, 217, 234)
+font_small = pygame.font.SysFont('Lucida Sans', 20)
+font_big = pygame.font.SysFont('Lucida Sans', 24)
 
 #loading the background
 viking_sea = pygame.image.load('assets/backgrounds/viking_sea_background.jpg')
@@ -491,6 +497,10 @@ def reset_count(counter,reset_counter):
         counter = 7
     return counter
 
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img, (x, y))
+
 def reset_enemies():
     for enemy in enemy_ninja_group:
         enemy.kill()
@@ -537,153 +547,180 @@ reset_counter_3 = True
 run = True
 # Game loop
 while run:
-    #event loop
-    clock.tick(FPS)
-    draw_bg()
-    world.draw()
-    sc = round(score)
-    s = str(sc)
-    screen.blit(fontScore.render("Score: " + s,True,(255,0,0)),(50,50))
     if ninja.alive:
-        score += score_increment
-   
-    # commenting out the enemy for now
-    healthbar.draw(ninja.health,screen)
-    ninja.update()
-    ninja.draw(screen)
-
-    #draw enemies on screen
-    for enemy in enemy_ninja_group:
-        enemy.draw(screen)
-        enemy.ai(ninja)
-        enemy.update()
-        enemy.move_towards_ninja(ninja)
-        if pygame.sprite.spritecollide(enemy,hero_group,False):
-            if enemy.alive:
-                enemy.hit()
-
-    for p in punch_group:
-        p.move(moving_left,moving_right)
-        p.draw()
-        p.update()
-    for h in hit_group:
-        h.update()
-        h.draw()
-
-
-    if ninja.alive:
-        screen_scroll = ninja.move(moving_left,moving_right)
-        bg_scroll -= screen_scroll
-        if punch:
-            ninja.punch()
-            punch = False
-            
-    #game logic
-    screen.blit(fontText.render(getReadyText,True,(0,0,0)),(100,100))
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-        #keyboard press
-        if event.type == pygame.USEREVENT:
-            counter -= 1
-            if phaseNum ==0:
-                if counter > 2:
-                    text = str(counter-2)
-                elif counter > 0:
-                    text = 'Start'
-                elif counter == 0:
-                    text = 'Start!'
-                    phaseNum += 1
-            if phaseNum == 2:
-                counter = reset_count(counter,reset_counter_2)
-                reset_counter_2 = False
-                if counter == 7:
-                    getReadyText = '   Phase 1 Complete!'
-                elif counter > 3:
-                    text = str(counter -3)
-                    getReadyText = 'Get Ready for Phase 2!'
-                elif counter > 0:
-                    text = 'Start'
-                elif counter ==0:
-                    text = 'Start!'
-                    level1_done = True
-            if phaseNum == 3:
-                counter = reset_count(counter,reset_counter_3)
-                reset_counter_3 = False
-                if counter == 7:
-                    getReadyText = '   Phase 2 Complete!'
-                if counter > 3:
-                    text = str(counter -3)
-                    getReadyText = 'Get Ready for Phase 3!'
-                elif counter > 0:
-                    text = 'Start'
-                elif counter ==0:
-                    text = 'Start!'
-                    level2_done = True
+        clock.tick(FPS)
+        draw_bg()
+        world.draw()
+        sc = round(score2)
+        s = str(sc)
+        screen.blit(fontScore.render("Score: " + s,True,(255,0,0)),(50,50))
+        if ninja.alive:
+            score2 += score_increment
     
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                moving_left = True
-            if event.key == pygame.K_RIGHT:
-                moving_right= True
-            if event.key == pygame.K_UP and ninja.alive:
-                ninja.jump = True
-                for p in punch_group:
-                    p.jump = True
-            if event.key == pygame.K_SPACE:
-                punch = True
-        #keyboard release
-        if event.type == pygame.KEYUP:
-           if event.key == pygame.K_LEFT:
-               moving_left = False
-           if event.key == pygame.K_RIGHT:
-               moving_right= False
-    screen.blit(fontNum.render(text,True,(0,0,0)),(350,200))
-    if text == 'Start!':
-        text = ''
-        getReadyText = ''
-    start = pygame.time.get_ticks()
+        # commenting out the enemy for now
+        healthbar.draw(ninja.health,screen)
+        ninja.update()
+        ninja.draw(screen)
 
-    if level_done:
-        phaseNum += 1
-        level_done = False
-    
-    if phaseNum == 1 and x == 0:
-        print(phaseNum)
-        createEnemy()
-        timer = threading.Timer(2,createEnemy)
-        timer.start()
-        timer = threading.Timer(3,createEnemy)
-        timer.start()
-        x = 1
-        level1_intro_done = True
+        #draw enemies on screen
+        for enemy in enemy_ninja_group:
+            enemy.draw(screen)
+            enemy.ai(ninja)
+            enemy.update()
+            enemy.move_towards_ninja(ninja)
+            if pygame.sprite.spritecollide(enemy,hero_group,False):
+                if enemy.alive:
+                    enemy.hit()
 
-    if phaseNum == 2 and level1_done == True:
-        createEnemy()
-        createEnemy()
-        timer = threading.Timer(2,createEnemy)
-        timer.start()
-        timer = threading.Timer(2,createEnemy)
-        timer.start()
-        level1_done = False
+        for p in punch_group:
+            p.move(moving_left,moving_right)
+            p.draw()
+            p.update()
+        for h in hit_group:
+            h.update()
+            h.draw()
 
-    if phaseNum ==3 and level2_done == True:
-        level1_done = False
-        createEnemy()
-        createEnemy()
-        timer = threading.Timer(2,createEnemy)
-        timer.start()
-        timer = threading.Timer(2,createEnemy)
-        timer.start()
-        timer = threading.Timer(2,createEnemy)
-        timer.start()
-        level2_done = False
-    if phaseNum == 4:
-        getReadyText = '     YOU DID IT!'
+
+        if ninja.alive:
+            screen_scroll = ninja.move(moving_left,moving_right)
+            bg_scroll -= screen_scroll
+            if punch:
+                ninja.punch()
+                punch = False
+                
+        #game logic
+        screen.blit(fontText.render(getReadyText,True,(0,0,0)),(100,100))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            #keyboard press
+            if event.type == pygame.USEREVENT:
+                counter -= 1
+                if phaseNum ==0:
+                    if counter > 2:
+                        text = str(counter-2)
+                    elif counter > 0:
+                        text = 'Start'
+                    elif counter == 0:
+                        text = 'Start!'
+                        phaseNum += 1
+                if phaseNum == 2:
+                    counter = reset_count(counter,reset_counter_2)
+                    reset_counter_2 = False
+                    if counter == 7:
+                        getReadyText = '   Phase 1 Complete!'
+                    elif counter > 3:
+                        text = str(counter -3)
+                        getReadyText = 'Get Ready for Phase 2!'
+                    elif counter > 0:
+                        text = 'Start'
+                    elif counter ==0:
+                        text = 'Start!'
+                        level1_done = True
+                if phaseNum == 3:
+                    counter = reset_count(counter,reset_counter_3)
+                    reset_counter_3 = False
+                    if counter == 7:
+                        getReadyText = '   Phase 2 Complete!'
+                    if counter > 3:
+                        text = str(counter -3)
+                        getReadyText = 'Get Ready for Phase 3!'
+                    elif counter > 0:
+                        text = 'Start'
+                    elif counter ==0:
+                        text = 'Start!'
+                        level2_done = True
         
-    level_done = check_level_done()
-    if level_done == True:
-        reset_enemies()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    moving_left = True
+                if event.key == pygame.K_RIGHT:
+                    moving_right= True
+                if event.key == pygame.K_UP and ninja.alive:
+                    ninja.jump = True
+                    for p in punch_group:
+                        p.jump = True
+                if event.key == pygame.K_SPACE:
+                    punch = True
+            #keyboard release
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT:
+                    moving_left = False
+                if event.key == pygame.K_RIGHT:
+                    moving_right= False
+        screen.blit(fontNum.render(text,True,(0,0,0)),(350,200))
+        if text == 'Start!':
+            text = ''
+            getReadyText = ''
+        start = pygame.time.get_ticks()
+
+        if level_done:
+            phaseNum += 1
+            level_done = False
+        
+        if phaseNum == 1 and x == 0:
+            print(phaseNum)
+            createEnemy()
+            timer = threading.Timer(2,createEnemy)
+            timer.start()
+            timer = threading.Timer(3,createEnemy)
+            timer.start()
+            x = 1
+            level1_intro_done = True
+
+        if phaseNum == 2 and level1_done == True:
+            createEnemy()
+            createEnemy()
+            timer = threading.Timer(2,createEnemy)
+            timer.start()
+            timer = threading.Timer(2,createEnemy)
+            timer.start()
+            level1_done = False
+
+        if phaseNum ==3 and level2_done == True:
+            level1_done = False
+            createEnemy()
+            createEnemy()
+            timer = threading.Timer(2,createEnemy)
+            timer.start()
+            timer = threading.Timer(2,createEnemy)
+            timer.start()
+            timer = threading.Timer(2,createEnemy)
+            timer.start()
+            level2_done = False
+        if phaseNum == 4:
+            getReadyText = '     YOU DID IT!'
+            
+        level_done = check_level_done()
+        if level_done == True:
+            reset_enemies()
+    else:
+        if fade_counter < SCREEN_WIDTH:
+            fade_counter += 5
+            for y in range(0, 6, 2):
+                pygame.draw.rect(screen, BLACK, (0, y * 100, fade_counter, 100))
+                pygame.draw.rect(screen, BLACK, (SCREEN_WIDTH - fade_counter, (y + 1) * 100, SCREEN_WIDTH, 100))
+        else:
+            draw_text('Game Over!', font_big, WHITE, 220, 200)
+            draw_text('Press space to try again', font_big, WHITE, 150, 300)
+            key = pygame.key.get_pressed()
+            if key[pygame.K_SPACE]:
+                ninja.kill()
+                phaseNum = 0
+                score2 = 0
+                for enemy in enemy_ninja_group:
+                    enemy.kill()
+                for punch in punch_group:
+                    punch.kill()
+                for hit in hit_group:
+                    hit.kill()
+                level1_done = False
+                level2_done = False
+                level_done = False
+                ninja, healthbar = world.process_data(world_data)
+                
+
+    
 
     pygame.display.update()
     #render
