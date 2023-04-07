@@ -393,14 +393,10 @@ while run:
         enemy.draw(screen)
         enemy.update()
 
-<<<<<<< HEAD
-   
-=======
     #draw exit on screen
     exit_group.update()
     exit_group.draw(screen)
  
->>>>>>> 065f869a06252a13152f47a64995b27023152be1
 
     if ninja.alive:
         screen_scroll, level_complete = ninja.move(moving_left, moving_right)
