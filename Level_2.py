@@ -20,6 +20,8 @@ cols1 = 20
 SCROLL_THRESH = 200
 screen_scroll = 0
 bg_scroll = 0
+score = 0
+score_increment = 0.05
 
 #loading the background
 viking_sea = pygame.image.load('assets/backgrounds/viking_sea_background.jpg')
@@ -514,6 +516,7 @@ getReadyText = 'Get Ready for Phase 1!'
 pygame.time.set_timer(pygame.USEREVENT,1000)
 fontNum = pygame.font.SysFont('Consolas',100)
 fontText = pygame.font.SysFont('Consolas',50)
+fontScore = pygame.font.SysFont('Condolas',20)
 hero_group = pygame.sprite.Group()
 hero_group.add(ninja)
 
@@ -538,6 +541,11 @@ while run:
     clock.tick(FPS)
     draw_bg()
     world.draw()
+    sc = round(score)
+    s = str(sc)
+    screen.blit(fontScore.render("Score: " + s,True,(255,0,0)),(50,50))
+    if ninja.alive:
+        score += score_increment
    
     # commenting out the enemy for now
     healthbar.draw(ninja.health,screen)

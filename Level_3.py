@@ -26,6 +26,9 @@ bg_scroll = 0
 game_over = False
 score = 0
 fade_counter = 0
+fontScore = pygame.font.SysFont('Condolas',20)
+score = 0
+score_increment = 0.05
 
 
 #define colours
@@ -202,9 +205,14 @@ run = True
 while run:
 
 	clock.tick(FPS)
+	
 
 	if game_over == False:
 		scroll = ninja.move()
+		score += score_increment
+		sc = round(score)
+		s = str(sc)
+		screen.blit(fontScore.render("Score: " + s,True,(255,0,0)),(50,50))
 
 		draw_bg(bg_scroll)
 
