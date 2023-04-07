@@ -8,7 +8,7 @@ pygame.init()
 
 #game window dimensions
 SCREEN_WIDTH = 500
-SCREEN_HEIGHT = 800
+SCREEN_HEIGHT = 816
 #create game window
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Level 3')
@@ -19,8 +19,8 @@ FPS = 60
 
 #game variables
 SCROLL_THRESH = 200
-GRAVITY = 0.75
-MAX_PLATFORMS = 10
+GRAVITY = 0.5
+MAX_PLATFORMS = 40
 scroll = 0
 bg_scroll = 0
 game_over = False
@@ -58,8 +58,8 @@ platform_image = pygame.image.load('Assets/Sprites/wood.png').convert_alpha()
 #function for drawing the background
 def draw_bg(bg_scroll):
 	screen.blit(bg_image, (0, 0 + bg_scroll))
-	screen.blit(bg_image, (0, -600 + bg_scroll))
-
+	screen.blit(bg_image, (0, -100 + bg_scroll))
+	
 #player class
 class Ninja():
 	def __init__(self, x, y):
@@ -80,13 +80,13 @@ class Ninja():
 		#process keypresses
 		key = pygame.key.get_pressed()
 		if key[pygame.K_LEFT]:
-			dx = -10
+			dx = -8
 			self.flip = True
 		if key[pygame.K_RIGHT]:
-			dx = 10
+			dx = 8
 			self.flip = False
 		if key[pygame.K_UP]:
-			self.vel_y = -15
+			self.vel_y = -10
 
 		#gravity
 		self.vel_y += GRAVITY
@@ -108,6 +108,7 @@ class Ninja():
 					if self.vel_y > 0:
 						self.rect.bottom = platform.rect.top
 						dy = 0
+						self.vel_y = 0
 						
         #check if the player has bounced to the top or bottom of the screen
 		if self.rect.top <= SCROLL_THRESH:
@@ -158,9 +159,8 @@ class Platform(pygame.sprite.Sprite):
 		#update platform's vertical position
 		self.rect.y += scroll
 
-		#check if platform has gone off the screen
-		if self.rect.top > SCREEN_HEIGHT:
-			self.kill()
+		
+
 
 #player instance
 ninja = Ninja(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 150)
@@ -170,8 +170,19 @@ platform_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 
 #create starting platform
-platform = Platform(SCREEN_WIDTH // 2 - 50, SCREEN_HEIGHT - 50, 100, False)
+platform = Platform(0, SCREEN_HEIGHT - 50, SCREEN_WIDTH, False)
 platform_group.add(platform)
+
+for p in range(MAX_PLATFORMS):
+    p_w = random.randint(50, 60)
+    p_x = random.randint(0, SCREEN_WIDTH - p_w)
+    p_y = platform.rect.y - random.randint(80, 120)
+    p_type = random.choices([1, 2], weights=[0.2, 0.8])[0] # Randomly choose between 1 and 2 with 20% and 80% probability respectively
+    p_moving = False
+    if p_type == 1:
+        p_moving = True
+    platform = Platform(p_x, p_y, p_w, p_moving)
+    platform_group.add(platform)
 
 #game loop
 run = True
@@ -184,23 +195,12 @@ while run:
 
 		#draw background
 		bg_scroll += scroll
-		if bg_scroll >= 600:
+		if bg_scroll >= 100:
 			bg_scroll = 0
 		draw_bg(bg_scroll)
 
 		#generate platforms
-		if len(platform_group) < MAX_PLATFORMS:
-			p_w = random.randint(50, 60)
-			p_x = random.randint(0, SCREEN_WIDTH - p_w)
-			p_y = platform.rect.y - random.randint(80, 120)
-			p_type = random.randint(1, 2)
-			if p_type == 1 and score > 500:
-				p_moving = True
-			else:
-				p_moving = False
-			platform = Platform(p_x, p_y, p_w, p_moving)
-			platform_group.add(platform)
-
+		
 		#update platforms
 		platform_group.update(scroll)
 
