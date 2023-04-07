@@ -128,7 +128,7 @@ class Ninja(pygame.sprite.Sprite):
             self.direction = 0.75
 
         #jumping
-        if self.jump == True and self.jump_counter < 2:
+        if self.jump == True and self.jump_counter < 1:
             self.vel_y = -14
             self.jump = False
             self.jump_counter +=1
@@ -173,6 +173,33 @@ class Ninja(pygame.sprite.Sprite):
                 self.idling_counter = 50
             # if self.vision.colliderect(ninja.rect):
             #     self.throw_star(sprite_group)
+class Hit(pygame.sprite.Sprite):
+    def __init__(self,x,y,direction):
+        pygame.sprite.Sprite.__init__(self)
+        img = pygame.image.load('Sprites/viking_hit_3.png').convert_alpha()
+        img = pygame.transform.scale(img,(img.get_width()/3,img.get_height()/3))
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.rect.center = (x,y)
+        self.hitting = False
+        self.flip = False
+        self.direction = direction
+        self.animation_cooldown = 5
+        
+
+    def draw (self):
+        screen.blit(pygame.transform.flip(self.image,self.flip,False),self.rect)
+    def update(self):
+        if self.animation_cooldown > 0:
+            self.animation_cooldown -= 1
+        if pygame.sprite.spritecollide(ninja,hit_group,False):
+            if ninja.alive:  
+                if self.animation_cooldown == 0:
+                    self.kill()
+                    ninja.health -= 5
+                    
+                
+
 
 class Punch(pygame.sprite.Sprite):
     def __init__(self,x,y,direction):
@@ -183,7 +210,7 @@ class Punch(pygame.sprite.Sprite):
         self.jump = False
         self.scale = 15
         self.flip = False
-        self.animation_cooldown = 20
+        self.animation_cooldown = 30
         img = pygame.image.load('Sprites/hero_punch.png')
         img = pygame.transform.scale(img, (img.get_width() / 15, img.get_height()/15))
         self.image = img
@@ -196,7 +223,6 @@ class Punch(pygame.sprite.Sprite):
         if self.animation_cooldown > 0:
             self.animation_cooldown -= 1
         for enemy in enemy_ninja_group:
-            #make fist time out after a couple seconds
             if pygame.sprite.spritecollide(enemy, punch_group,False):
                 if enemy.alive:
                     enemy.health -= 10
@@ -219,7 +245,7 @@ class Punch(pygame.sprite.Sprite):
             self.direction = 0.75
 
         #jumping
-        if self.jump == True and self.jump_counter < 2:
+        if self.jump == True and self.jump_counter < 1:
             self.vel_y = -14
             self.jump = False
             self.jump_counter +=1
@@ -275,6 +301,7 @@ class Viking(pygame.sprite.Sprite):
         self.jump_counter = 0
         self.update_time = pygame.time.get_ticks()
         self.idling = False
+        self.hit_cooldowon = 0
         self.idling_counter = 0
         self.animation_list = []
         img = pygame.image.load('Sprites/viking_test.png')
@@ -289,6 +316,8 @@ class Viking(pygame.sprite.Sprite):
 
     def update(self):
         self.dead()
+        if self.hit_cooldowon > 0:
+            self.hit_cooldowon -=1
         
 
     def dead(self):
@@ -306,21 +335,30 @@ class Viking(pygame.sprite.Sprite):
             self.action = new_action
             self.update_animation()
 
-    
+    def hit(self):
+        if ninja.alive:
+            if self.hit_cooldowon == 0:
+                self.hit_cooldowon = 20
+                k = Hit(self.rect.centerx + (0.25 * self.rect.size[0]*self.direction),self.rect.centery,self.direction)
+                hit_group.add(k)
+        
+
 
     def move_towards_ninja(self,ninja):
-        if self.alive:
-            # Find direction vector (dx, dy) between enemy and player.
-            dx = ninja.rect.x - self.rect.x
-            if(dx <0):
-                self.flip = False
-            else:
-                self.flip = True
-            dirvect = pygame.math.Vector2(ninja.rect.x - self.rect.x, ninja.rect.y - self.rect.y)
-            dirvect.normalize()
-            # Move along this normalized vector towards the player at current speed.
-            dirvect.scale_to_length(self.speed)
-            self.rect.move_ip(dirvect)
+        if ninja.alive:
+            if self.alive:
+                # Find direction vector (dx, dy) between enemy and player.
+                dx = ninja.rect.x - self.rect.x
+                if(dx <0):
+                    self.flip = False
+                else:
+                    self.flip = True
+                dirvect = pygame.math.Vector2(ninja.rect.x - self.rect.x, ninja.rect.y - self.rect.y)
+                dirvect.normalize()
+                # Move along this normalized vector towards the player at current speed.
+                dirvect.scale_to_length(self.speed)
+                self.rect.move_ip(dirvect)
+        
         
     
     def draw(self,screen):
@@ -409,8 +447,6 @@ class World():
             tile[1][0] += screen_scroll
             screen.blit(tile[0], tile[1])
 
-    
-
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
@@ -433,7 +469,7 @@ def draw_bg():
 
 enemy_ninja_group = pygame.sprite.Group()
 punch_group = pygame.sprite.Group()
-
+hit_group = pygame.sprite.Group()
 
 star_group = pygame.sprite.Group()
 
@@ -448,13 +484,9 @@ def star_hit(self):
         self.kill()
 
 def createEnemy():
-    x = random.randint(0,1)
-    if x == 0:
-        enemy = Viking(150, 350, 2.5,3)
-        enemy_ninja_group.add(enemy)
-    else:
-        enemy = Viking(650, 350, 2.5,3)
-        enemy_ninja_group.add(enemy)
+    x = random.randint(150,650)
+    enemy = Viking(x, 350, 2.5,3)
+    enemy_ninja_group.add(enemy)
 
 # def update_animation(ninja,screen):
 #     img = pygame.image.load('Sprites/ninja_hero.png')
@@ -472,7 +504,14 @@ def check_level_done():
     
     return test
 
+def reset_count(counter,reset_counter):
+    if reset_counter == True:
+        counter = 6
+    return counter
 
+def reset_enemies():
+    for enemy in enemy_ninja_group:
+        enemy.kill()
 
 # UI functions
 
@@ -490,7 +529,7 @@ with open(f'level{level}_data.csv', newline='') as csvfile:
             world_data[x][y] = int(tile)
 world = World()
 ninja, healthbar = world.process_data(world_data)            
-counter, text = 3, '3'
+counter, text = 5, '3'
 getReadyText = 'Get Ready for Phase 1!'
 pygame.time.set_timer(pygame.USEREVENT,1000)
 fontNum = pygame.font.SysFont('Consolas',100)
@@ -506,6 +545,9 @@ level3_done = False
 level1_intro_done = False
 level2_intro_done = False
 level3_intro_done = False
+move_on = False
+reset_counter_2 = True
+reset_counter_3 = True
 
 
 
@@ -525,14 +567,20 @@ while run:
     #draw enemies on screen
     for enemy in enemy_ninja_group:
         enemy.draw(screen)
-        enemy.dead()
         enemy.ai(ninja)
+        enemy.update()
         enemy.move_towards_ninja(ninja)
+        if pygame.sprite.spritecollide(enemy,hero_group,False):
+            if enemy.alive:
+                enemy.hit()
 
     for p in punch_group:
         p.move(moving_left,moving_right)
         p.draw()
         p.update()
+    for h in hit_group:
+        h.update()
+        h.draw()
 
 
     if ninja.alive:
@@ -550,27 +598,36 @@ while run:
         #keyboard press
         if event.type == pygame.USEREVENT:
             counter -= 1
-            if counter > 0:
-                text = str(counter)
-            elif phaseNum == 0 and counter == 0:
-                text = 'Start!'
-            if level1_intro_done and level_done == True:
-                counter = 5
-                if counter > 0:
-                    text = str(counter)
+            if phaseNum ==0:
+                if counter > 2:
+                    text = str(counter-2)
+                elif counter > 0:
+                    text = 'Start'
+                elif counter == 0:
+                    text = 'Start!'
+                    phaseNum += 1
+            if phaseNum == 2:
+                counter = reset_count(counter,reset_counter_2)
+                reset_counter_2 = False
+                if counter > 3:
+                    text = str(counter -3)
                     getReadyText = 'Get Ready for Phase 2!'
-                else:
+                elif counter > 0:
+                    text = 'Start'
+                elif counter ==0:
                     text = 'Start!'
-                    level1_done == True
-                    
-            elif level2_intro_done == True:
-                counter = 5
-                if counter > 0:
-                    text = str(counter)
-                    getReadyText = 'Get Ready for the Final Phase!'
-                else:
+                    level1_done = True
+            if phaseNum == 3:
+                counter = reset_count(counter,reset_counter_3)
+                reset_counter_3 = False
+                if counter > 3:
+                    text = str(counter -3)
+                    getReadyText = 'Get Ready for Phase 3!'
+                elif counter > 0:
+                    text = 'Start'
+                elif counter ==0:
                     text = 'Start!'
-                    level2_done == True
+                    level2_done = True
     
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
@@ -591,8 +648,6 @@ while run:
                moving_right= False
     screen.blit(fontNum.render(text,True,(0,0,0)),(350,200))
     if text == 'Start!':
-        if(level1_intro_done == False):
-            phaseNum = 1
         text = ''
         getReadyText = ''
     start = pygame.time.get_ticks()
@@ -606,43 +661,40 @@ while run:
         createEnemy()
         timer = threading.Timer(2,createEnemy)
         timer.start()
-        timer = threading.Timer(4,createEnemy)
+        timer = threading.Timer(3,createEnemy)
         timer.start()
         x = 1
         level1_intro_done = True
 
-    if phaseNum > 1 and level1_done == True:
-        level1_intro_done = False
-        phaseNum = 0
+    if phaseNum == 2 and level1_done == True:
+        createEnemy()
         createEnemy()
         timer = threading.Timer(2,createEnemy)
         timer.start()
-        timer = threading.Timer(4,createEnemy)
+        timer = threading.Timer(2,createEnemy)
         timer.start()
-        timer = threading.Timer(6,createEnemy)
-        timer.start()
-        level2_intro_done = True
         level1_done = False
-        
 
-    if phaseNum > 1 and level2_done == True:
-        level2_intro_done = False
-        phaseNum = 0
+    if phaseNum ==3 and level2_done == True:
         level1_done = False
+        createEnemy()
         createEnemy()
         timer = threading.Timer(2,createEnemy)
         timer.start()
-        timer = threading.Timer(4,createEnemy)
+        timer = threading.Timer(2,createEnemy)
         timer.start()
-        timer = threading.Timer(6,createEnemy)
-        timer.start()
-        timer = threading.Timer(6,createEnemy)
+        timer = threading.Timer(2,createEnemy)
         timer.start()
         level2_done = False
+    if phaseNum == 4:
+        getReadyText = '        You did it!'
         
-
-
     level_done = check_level_done()
+    if level_done == True:
+        reset_enemies()
+
+
+    
 
     
 
