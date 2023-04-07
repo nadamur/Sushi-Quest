@@ -93,8 +93,9 @@ class Ninja(pygame.sprite.Sprite):
             img = pygame.image.load('Sprites/ninja_punch.png')
             self.image = pygame.transform.scale(img, (img.get_width() / self.scale, img.get_height()/self.scale))
             self.draw(screen)
-            timer = threading.Timer(100,update_animation(self,screen))
-            timer.start()
+            #image not really working ... dunno why
+            # t = threading.Timer(10,update_animation(self,screen))
+            # t.start()
 
 
 
@@ -376,8 +377,13 @@ getReadyText = 'Get Ready for Phase 1!'
 pygame.time.set_timer(pygame.USEREVENT,1000)
 fontNum = pygame.font.SysFont('Consolas',100)
 fontText = pygame.font.SysFont('Consolas',50)
+hero_group = pygame.sprite.Group()
+hero_group.add(ninja)
 
 phaseNum = 0
+phase1_done = False
+phase2_done = False
+phase3_done = False
 
 run = True
 # Game loop
@@ -427,6 +433,7 @@ while run:
             if event.key == pygame.K_UP and ninja.alive:
                 ninja.jump = True
             if event.key == pygame.K_SPACE:
+                enemy_collisions = pygame.sprite.groupcollide(enemy_ninja_group,hero_group,True,False)
                 ninja.punch(screen)
         #keyboard release
         if event.type == pygame.KEYUP:
@@ -442,11 +449,12 @@ while run:
     start = pygame.time.get_ticks()
     if phaseNum == 1:
         createEnemy()
-        timer = threading.Timer(3,createEnemy)
+        timer = threading.Timer(2,createEnemy)
         timer.start()
-        timer = threading.Timer(6,createEnemy)
+        timer = threading.Timer(4,createEnemy)
         timer.start()
         phaseNum +=1
+        phase1_done = True
 
 
     
