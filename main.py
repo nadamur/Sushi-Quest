@@ -179,52 +179,65 @@ class Ninja(pygame.sprite.Sprite):
                     if self.idling_counter <= 0:
                         self.idling = False
 
-class Star(pygame.sprite.Sprite):
-	def __init__(self, x, y, direction):
-		pygame.sprite.Sprite.__init__(self)
-		self.speed = 10
-		self.image = star_img
-		self.rect = self.image.get_rect()
-		self.rect.center = (x, y)
-		self.direction = direction
+class Stars(pygame.sprite.Sprite):
+    def __init__(self, image, x, y, target_x, target_y):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect(center=(x, y))
+        self.speed = 5
+        self.target = pygame.math.Vector2(target_x, target_y)
+        self.direction = self.target - pygame.math.Vector2(x, y)
+        self.distance = self.direction.length()
+        self.direction.normalize_ip()
+    
+    def update(self):
+        self.rect.move_ip(self.direction * self.speed)
+        self.distance -= self.speed
+        if self.distance <= 0:
+            self.kill()
 
-	def update(self):
-		#move star
-		self.rect.x += (self.direction * self.speed)
-		#check if star has gone off screen
-		if self.rect.right < 0 or self.rect.left > SCREEN_WIDTH:
-			self.kill()
-
-		#check collision with character
-		if pygame.sprite.spritecollide(ninja, star_group, False):
-			if ninja.alive:
-				ninja.health -= 5
-				self.kill()
                                         
 class EnemyNinja(pygame.sprite.Sprite):
-    def __init__(self, x, y, scale,speed):
-        pygame.sprite.Sprite.__init__(self)
-        self.alive = True
-        self.vision = pygame.Rect(0,0,150,640)
-        self.speed = speed
-        self.direction = 1
-        self.vel_y = 0
-        self.jump = False
-        self.flip = False
-        self.frame_index = 0
-        self.action = 0
-        self.health = 100
-        self.max_health = self.health
-        self.jump_counter = 0
-        self.update_time = pygame.time.get_ticks()
-        self.idling = False
-        self.idling_counter = 0
-
+    def __init__(self, x, y, scale, speed):
+        super().__init__()
         img = pygame.image.load('Assets/Ninja/ninja_hero_sprite_orange.png')
         self.image = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))   
         self.image = self.image.subsurface(5,0,self.image.get_width()-14,self.image.get_height()-20)      
         self.rect = self.image.get_rect() 
-        self.rect.center = (x, y) 
+        self.rect.center = (x, y)
+        self.stars_image = pygame.image.load('Sprites/Star.png').convert_alpha()
+        self.stars_rect = self.stars_image.get_rect()
+        self.speed = 3
+        self.distance = 200
+        self.attack_distance = 50
+        self.is_throwing_stars = False
+    
+    def update(self, ninja):
+        dx, dy = ninja.rect.x - self.rect.x, ninja.rect.y - self.rect.y
+        distance = (dx ** 2 + dy ** 2) ** 0.5
+        if distance < self.distance:
+            self.is_throwing_stars = True
+            self.throw_stars(ninja)
+        else:
+            self.is_throwing_stars = False
+        if distance < self.attack_distance:
+            self.attack(ninja)
+        else:
+            self.move(dx, dy)
+    
+    def move(self, dx, dy):
+        angle = math.atan2(dy, dx)
+        self.rect.x += self.speed * math.cos(angle)
+        self.rect.y += self.speed * math.sin(angle)
+    
+    def attack(self, ninja):
+        pass  # TODO: implement attack behavior
+    
+    def throw_stars(self, ninja):
+        if self.is_throwing_stars:
+            for i in range(3):
+                stars = Stars(self.stars_image, self.rect.x, self.rect.y, ninja.rect.x, ninja.rect.y)
+                star_group.add(stars)
 
     #class that throws 1 star from the enemy ninja of GameObjects.py EnemyStar class
     #def throw_star(self):
@@ -291,17 +304,17 @@ class EnemyNinja(pygame.sprite.Sprite):
 
         return screen_scroll
     
-    def ai(self,ninja):
-        if self.alive and ninja.alive:
-            if self.idling == False and random.randint(1,200) == 1: 
-                self.idling = True 
-                self.idling_counter = 50 
+    #def ai(self,ninja):
+     #   if self.alive and ninja.alive:
+      #      if self.idling == False and random.randint(1,200) == 1: 
+       #         self.idling = True 
+        #        self.idling_counter = 50 
             # if self.vision.colliderect(ninja.rect):
             # #     self.throw_star(sprite_group)
             # else:
             #     if self.idling == False:
             #         if self.direction ==1:
-            self.move()
+         #   self.move()
 
 
 #creating the world
@@ -412,7 +425,7 @@ while run:
 
     #draw enemies on screen
     for enemy in enemy_ninja_group:
-        enemy.ai(ninja)
+        enemy.ai(enemy)
         enemy.draw(screen)
         enemy.update()
 
