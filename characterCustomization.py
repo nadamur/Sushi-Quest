@@ -172,7 +172,7 @@ NINJA_COLORS = {
     "orange": "Assets/Ninja/ninja_hero_sprite_orange.png",
     "pink": "Assets/Ninja/ninja_hero_sprite_pink.png",
     "purple": "Assets/Ninja/ninja_hero_sprite_purple.png",
-    "yellow": "Assets/Ninja/ninja_hero_sprite_yellow.png",
+    "red": "Assets/Ninja/ninja_hero_sprite_red.png",
 }
 SCALE_FACTOR = 0.3  # Change this value to adjust the size of the ninja sprite
 ninja_sprites = {

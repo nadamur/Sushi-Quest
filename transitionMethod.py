@@ -18,16 +18,16 @@ def display_win_screen(screen, award_image, new_skill, WIN_WIDTH=640, WIN_HEIGHT
     # Render the "You Win!" text
     win_font = pygame.font.Font(None, 72)
     win_text = win_font.render("You Win!", True, (255, 255, 255))
-    win_text_rect = win_text.get_rect(center=(WIN_WIDTH / 2, WIN_HEIGHT / 2 - 100))
+    win_text_rect = win_text.get_rect(center=(400, 300 - 100))
 
     # Load the award image and position it
     award = pygame.image.load(award_image)
-    award_rect = award.get_rect(center=(WIN_WIDTH / 2, WIN_HEIGHT / 2))
+    award_rect = award.get_rect(center=(400, 300))
 
     # Render the new skill text
     skill_font = pygame.font.Font(None, 48)
     skill_text = skill_font.render(f"New Skill: {new_skill}", True, (255, 255, 255))
-    skill_text_rect = skill_text.get_rect(center=(WIN_WIDTH / 2, WIN_HEIGHT / 2 + 100))
+    skill_text_rect = skill_text.get_rect(center=(400, 300 + 100))
 
     # Draw everything on the screen
     screen.blit(win_text, win_text_rect)
