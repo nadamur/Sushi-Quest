@@ -80,14 +80,14 @@ class Ninja(pygame.sprite.Sprite):
             img = pygame.image.load(f'Assets/Ninja/ninja_hero_sprite_{selected_color}.png')
             img = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))
             self.animation_list.append(img)
-            img = pygame.image.load('Sprites/dead_hero.png')
+            img = pygame.image.load(f'Assets/Ninja/dead_{selected_color}.png')
             img = pygame.transform.scale(img, (img.get_width() / self.scale, img.get_height()/self.scale))
             self.animation_list.append(img)  
         else:
-            img = pygame.image.load('Assets/Ninja/ninja_hero_sprite_orange.png')
+            img = pygame.image.load('Assets/Ninja/enemy_ninja.gif')
             img = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))
             self.animation_list.append(img)
-            img = pygame.image.load('Assets/Ninja/dead_orange.png')
+            img = pygame.image.load('Assets/Ninja/dead_enemy_ninja.png')
             img = pygame.transform.scale(img, (img.get_width() / self.scale, img.get_height()/self.scale))
             self.animation_list.append(img)  
 
