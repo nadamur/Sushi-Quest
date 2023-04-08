@@ -259,7 +259,6 @@ class Star(pygame.sprite.Sprite):
             if ninja.alive:
                 ninja.health -= 5
                 self.kill()
-                print(ninja.health)
 
 class Punch(pygame.sprite.Sprite):
     def __init__(self,x,y,direction):
@@ -425,12 +424,12 @@ world = World()
 ninja, healthbar = world.process_data(world_data)            
 star_img = pygame.image.load('Sprites/star.png').convert_alpha()
 #method to find enemy closest to player
-def find_closest_enemy(ninja):
-    closest_enemy = enemy_ninja_group.sprites()[0]
-    for enemy in enemy_ninja_group:
-        if abs(enemy.rect.x - ninja.rect.x) < abs(closest_enemy.rect.x - ninja.rect.x):
-            closest_enemy = enemy
-    return closest_enemy
+# def find_closest_enemy(ninja):
+#     closest_enemy = enemy_ninja_group.sprites()[0]
+#     for enemy in enemy_ninja_group:
+#         if abs(enemy.rect.x - ninja.rect.x) < abs(closest_enemy.rect.x - ninja.rect.x):
+#             closest_enemy = enemy
+#     return closest_enemy
 
 run = True
 # Game loop
@@ -444,7 +443,11 @@ while run:
     screen.blit(fontScore.render("Score: " + s,True,(255,0,0)),(20,50))
     if ninja.alive:
         score1 += score_increment
-   
+
+    for p in punch_group:
+            p.move(moving_left,moving_right)
+            p.draw()
+            p.update()
     # commenting out the enemy for now
     healthbar.draw(ninja.health,screen)
     ninja.update()
@@ -455,22 +458,19 @@ while run:
         enemy.ai()
         enemy.draw(screen)
         enemy.update()
-        print(str(enemy.health))
     star_group.draw(screen)
 
    #update and draw groups
     star_group.update()
     star_group.draw(screen)
-    for p in punch_group:
-            p.move(moving_left,moving_right)
-            p.draw()
-            p.update()
+    
+
+    
         
     if ninja.alive:
         screen_scroll = ninja.move(moving_left,moving_right)
         bg_scroll -= screen_scroll
         if punch:
-                print("punch")
                 ninja.punch()
                 punch = False
     
