@@ -135,6 +135,9 @@ class Ninja():
 	def draw(self):
 		screen.blit(pygame.transform.flip(self.image, self.flip, False), (self.rect.x - 12, self.rect.y - 5))
 
+
+
+
 #platform class
 class Platform(pygame.sprite.Sprite):
 	def __init__(self, x, y, width, moving):
@@ -201,6 +204,31 @@ last_platform_y -= random.randint(80, 120)
 last_platform = Platform(0, last_platform_y, SCREEN_WIDTH, False)
 platform_group.add(last_platform)
 
+def display_win_screen(screen, award_image, WIN_WIDTH=800, WIN_HEIGHT=800):
+    # Render the "You Win!" text
+    win_font = pygame.font.Font(None, 72)
+    win_text = win_font.render("Congradulations", True, (255, 255, 255))
+    win_text_rect = win_text.get_rect(center=(300, 300 - 100))
+
+    # Load the award image and position it
+    award = pygame.image.load(award_image)
+    award_rect = award.get_rect(center=(300, 300))
+
+    # Render the new skill text
+    skill_font = pygame.font.Font(None, 48)
+    skill_text = skill_font.render(f"You win the ultimate sushi!", True, (255, 255, 255))
+    skill_text_rect = skill_text.get_rect(center=(300, 300 + 100))
+
+    # Draw everything on the screen
+    screen.blit(win_text, win_text_rect)
+    screen.blit(award, award_rect)
+    screen.blit(skill_text, skill_text_rect)
+
+    # Update the display and wait
+    pygame.display.update()
+    pygame.time.delay(3000)
+
+
 
 #game loop
 run = True
@@ -230,7 +258,8 @@ while run:
 
 		#check if ninja has past the last platform
 		if ninja.rect.bottom < platform_group.sprites()[-1].rect.top:
-			game_over = True
+			# game_over = True
+			display_win_screen(screen,"Assets/Sushi/sushi.png")
 
 		if ninja.rect.top > SCREEN_HEIGHT:
 			game_over = True
