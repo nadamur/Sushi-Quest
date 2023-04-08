@@ -20,7 +20,7 @@ cols1 = 150
 SCROLL_THRESH = 200
 screen_scroll = 0
 bg_scroll = 0
-score1 = 0
+score = 0
 score_increment = 0.05
 fontScore = pygame.font.SysFont('Condolas',35)
 
@@ -439,11 +439,11 @@ while run:
     clock.tick(FPS)
     draw_bg()
     world.draw()
-    sc = round(score1)
+    sc = round(score)
     s = str(sc)
     screen.blit(fontScore.render("Score: " + s,True,(255,0,0)),(20,50))
     if ninja.alive:
-        score1 += score_increment
+        score += score_increment
     ninja.draw(screen)
     for enemy in enemy_ninja_group:
         enemy.draw(screen)
@@ -498,6 +498,7 @@ while run:
                moving_left = False
            if event.key == pygame.K_RIGHT:
                moving_right= False       
+    score1 = score
     
     
 

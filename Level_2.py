@@ -4,6 +4,7 @@ import GameObjects
 import csv
 import os
 import threading
+from main import score1
 
 # Creating the game objects 
 pygame.init()
@@ -20,7 +21,7 @@ cols1 = 20
 SCROLL_THRESH = 200
 screen_scroll = 0
 bg_scroll = 0
-score2 = 0
+score2 = score1
 score_increment = 0.05
 fade_counter = 0
 WHITE = (255, 255, 255)

@@ -2,6 +2,7 @@
 import pygame
 import random
 import os
+from Level_2 import score2
 
 #initialise pygame
 pygame.init()
@@ -24,9 +25,9 @@ MAX_PLATFORMS = 50
 scroll = 0
 bg_scroll = 0
 game_over = False
-score3 = 0
+score3 = score2
 fade_counter = 0
-fontScore = pygame.font.SysFont('Condolas',20)
+fontScore = pygame.font.SysFont('Condolas',35)
 score_increment = 0.05
 moving_left = False
 moving_right = False
@@ -260,10 +261,6 @@ while run:
 
 	if game_over == False:
 		scroll = ninja.move(moving_left,moving_right)
-		score3 += score_increment
-		sc = round(score3)
-		s = str(sc)
-		screen.blit(fontScore.render("Score: " + s,True,(255,0,0)),(50,50))
 
 		draw_bg(bg_scroll)
 
@@ -341,6 +338,10 @@ while run:
 				moving_left = False
 			if event.key == pygame.K_RIGHT:
 				moving_right = False
+	score3 += score_increment
+	sc = round(score3)
+	s = str(sc)
+	screen.blit(fontScore.render("Score: " + s,True,(255,0,0)),(10,10))
 
 
 	#update display window
