@@ -753,6 +753,8 @@ while run:
                         h.kill()
                     for e in hero_group:
                         e.kill()
+                    for hero in hero_group:
+                        hero.kill()
                 
 
     
