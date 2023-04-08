@@ -540,6 +540,33 @@ reset_counter_3 = True
 
 
 
+
+def display_win_screen(screen, award_image, new_skill, WIN_WIDTH=640, WIN_HEIGHT=800):
+    # Render the "You Win!" text
+    win_font = pygame.font.Font(None, 72)
+    win_text = win_font.render("You Win!", True, (255, 255, 255))
+    win_text_rect = win_text.get_rect(center=(400, 300 - 100))
+
+    # Load the award image and position it
+    award = pygame.image.load(award_image)
+    award_rect = award.get_rect(center=(400, 300))
+
+    # Render the new skill text
+    skill_font = pygame.font.Font(None, 48)
+    skill_text = skill_font.render(f"New Skill: {new_skill}", True, (255, 255, 255))
+    skill_text_rect = skill_text.get_rect(center=(400, 300 + 100))
+
+    # Draw everything on the screen
+    screen.blit(win_text, win_text_rect)
+    screen.blit(award, award_rect)
+    screen.blit(skill_text, skill_text_rect)
+
+    # Update the display and wait
+    pygame.display.update()
+    pygame.time.delay(3000)
+
+
+
 run = True
 # Game loop
 while run:
@@ -686,6 +713,7 @@ while run:
             level2_done = False
         if phaseNum == 4:
             getReadyText = '     YOU DID IT!'
+            display_win_screen(screen,"Assets/Sushi/salmon+cucumber.png","Level up")
             
         level_done = check_level_done()
         if level_done == True:
