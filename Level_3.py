@@ -19,7 +19,7 @@ FPS = 60
 
 #game variables
 SCROLL_THRESH = 200
-GRAVITY = 0.5
+GRAVITY = 0.3
 MAX_PLATFORMS = 50
 scroll = 0
 bg_scroll = 0
@@ -28,6 +28,8 @@ score3 = 0
 fade_counter = 0
 fontScore = pygame.font.SysFont('Condolas',20)
 score_increment = 0.05
+moving_left = False
+moving_right = False
 
 
 #define colours
@@ -73,25 +75,44 @@ class Ninja():
 		self.vel_y = 0
 		self.flip = False
 		self.jump = False
+		self.jump_counter = 0
 
-	def move(self):
+	def move(self, moving_left, moving_right):
 		#reset variables
 		scroll = 0
 		dx = 0
 		dy = 0
-
-		#process keypresses
-		key = pygame.key.get_pressed()
-		if key[pygame.K_LEFT]:
-			dx = -8
+		if moving_left:
+			dx = -5
 			self.flip = True
-		if key[pygame.K_RIGHT]:
-			dx = 8
+		if moving_right:
+			dx = 5
 			self.flip = False
-		if key[pygame.K_UP]:
-			if self.jump == False:
-				self.vel_y = -20
-				self.jump = True
+
+		if self.jump == True and self.jump_counter < 2:
+			self.vel_y = -15
+			self.jump_counter +=1
+			self.jump = False
+
+
+
+		# for event in pygame.event.get():
+		# 	#keyboard press
+		# 	if event.type == pygame.KEYDOWN:
+		# 		if event.key == pygame.K_UP:
+		# 			print(str(self.jump_counter))
+		# 			if self.jump_counter < 2:
+		# 				self.vel_y = -20
+		# 				self.jump_counter +=1
+						
+		# #process keypresses
+		# key = pygame.key.get_pressed()
+		# if key[pygame.K_LEFT]:
+		# 	dx = -8
+		# 	self.flip = True
+		# if key[pygame.K_RIGHT]:
+		# 	dx = 8
+		# 	self.flip = False
 			
 
 		#gravity
@@ -115,7 +136,7 @@ class Ninja():
 						self.rect.bottom = platform.rect.top
 						dy = 0
 						self.vel_y = 0
-						self.jump = False
+						self.jump_counter = 0
 						
         #check if the player has bounced to the top or bottom of the screen
 		if self.rect.top <= SCROLL_THRESH:
@@ -238,7 +259,7 @@ while run:
 	
 
 	if game_over == False:
-		scroll = ninja.move()
+		scroll = ninja.move(moving_left,moving_right)
 		score3 += score_increment
 		sc = round(score3)
 		s = str(sc)
@@ -297,6 +318,7 @@ while run:
 						p_moving = True
 					platform = Platform(p_x, p_y, p_w, p_moving)
 					platform_group.add(platform)
+	ninja.move(moving_left,moving_right)
 
 	#event handler
 	for event in pygame.event.get():
@@ -307,6 +329,18 @@ while run:
 			# 	with open('score.txt', 'w') as file:
 			# 		file.write(str(high_score))
 			run = False
+		if event.type == pygame.KEYDOWN:
+			if event.key == pygame.K_LEFT:
+				moving_left = True
+			if event.key == pygame.K_RIGHT:
+				moving_right = True
+			if event.key == pygame.K_UP:
+				ninja.jump = True
+		if event.type == pygame.KEYUP:
+			if event.key == pygame.K_LEFT:
+				moving_left = False
+			if event.key == pygame.K_RIGHT:
+				moving_right = False
 
 
 	#update display window
