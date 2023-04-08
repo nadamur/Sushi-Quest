@@ -36,8 +36,7 @@ BLACK = (0, 0, 0)
 PANEL = (153, 217, 234)
 
 #define font
-font_small = pygame.font.SysFont('Lucida Sans', 20)
-font_big = pygame.font.SysFont('Lucida Sans', 24)
+font_big = pygame.font.SysFont('Comic Sans', 24)
 
 #load images
 ninja_image = pygame.image.load('Assets/Sprites/ninja_hero_sprite.png').convert_alpha()
@@ -74,7 +73,6 @@ class Ninja():
 		self.vel_y = 0
 		self.flip = False
 		self.jump = False
-		self.jump_counter = 0
 
 	def move(self):
 		#reset variables
@@ -91,14 +89,9 @@ class Ninja():
 			dx = 8
 			self.flip = False
 		if key[pygame.K_UP]:
-			if self.jump_counter==0:
-				print(self.jump_counter)
+			if self.jump == False:
 				self.vel_y = -20
-				self.jump_counter += 1
-			elif self.jump_counter==1:
-				print(self.jump_counter)
-				self.vel_y = -20
-				self.jump_counter += 1
+				self.jump = True
 			
 
 		#gravity
@@ -122,19 +115,15 @@ class Ninja():
 						self.rect.bottom = platform.rect.top
 						dy = 0
 						self.vel_y = 0
-						self.jump_counter = 0
+						self.jump = False
 						
         #check if the player has bounced to the top or bottom of the screen
 		if self.rect.top <= SCROLL_THRESH:
 			#if player is jumping
 			if self.vel_y < 0:
 				scroll = -dy
-		# elif self.rect.bottom >= SCREEN_HEIGHT - SCROLL_THRESH:
-		# 	#if player is falling
-		# 	if self.vel_y > 0:
-		# 		scroll = -(self.rect.bottom - SCREEN_HEIGHT + SCROLL_THRESH)
-        
-		#update rectangle position
+
+
 		self.rect.x += dx
 		self.rect.y += dy + scroll
 
@@ -187,27 +176,30 @@ ninja = Ninja(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 150)
 platform_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 
-#create starting platform
+# Create starting platform
 platform = Platform(0, SCREEN_HEIGHT - 50, SCREEN_WIDTH, False)
 platform_group.add(platform)
-last_platform = None
 
-for p in range(MAX_PLATFORMS):
+last_platform_y = platform.rect.y
+
+for p in range(MAX_PLATFORMS-1):
     p_w = random.randint(50, 60)
     p_x = random.randint(0, SCREEN_WIDTH - p_w)
-    p_y = platform.rect.y - random.randint(80, 120)
+    p_y = last_platform_y - random.randint(80, 120)
     p_type = random.choices([1, 2], weights=[0.2, 0.8])[0] # Randomly choose between 1 and 2 with 20% and 80% probability respectively
     p_moving = False
     if p_type == 1:
         p_moving = True
     platform = Platform(p_x, p_y, p_w, p_moving)
     platform_group.add(platform)
-    last_platform = platform
-    
-# create final platform
-final_platform = Platform(random.randint(0, SCREEN_WIDTH - p_w), last_platform.rect.y - random.randint(80, 120), p_w, False)
-platform_group.add(final_platform)
+    last_platform_y = platform.rect.y
 
+# Generate last platform
+last_platform_w = SCREEN_WIDTH
+last_platform_x = 0
+last_platform_y -= random.randint(80, 120)
+last_platform = Platform(0, last_platform_y, SCREEN_WIDTH, False)
+platform_group.add(last_platform)
 
 
 #game loop
@@ -236,10 +228,13 @@ while run:
 		enemy_group.draw(screen)
 		ninja.draw()
 
-		#check game over
+		#check if ninja has past the last platform
+		if ninja.rect.bottom < platform_group.sprites()[-1].rect.top:
+			game_over = True
+
 		if ninja.rect.top > SCREEN_HEIGHT:
 			game_over = True
-		#check for collision with enemies
+
 	else:
 		if fade_counter < SCREEN_WIDTH:
 			fade_counter += 5
@@ -291,4 +286,3 @@ while run:
 
 
 pygame.quit()
-
