@@ -691,31 +691,41 @@ while run:
         if level_done == True:
             reset_enemies()
     else:
-        if fade_counter < SCREEN_WIDTH:
-            fade_counter += 5
-            for y in range(0, 6, 2):
-                pygame.draw.rect(screen, BLACK, (0, y * 100, fade_counter, 100))
-                pygame.draw.rect(screen, BLACK, (SCREEN_WIDTH - fade_counter, (y + 1) * 100, SCREEN_WIDTH, 100))
-        else:
-            draw_text('Game Over!', font_big, WHITE, 220, 200)
-            draw_text('Press space to try again', font_big, WHITE, 150, 300)
-            key = pygame.key.get_pressed()
-            if key[pygame.K_SPACE]:
-                ninja.kill()
-                phaseNum = 0
-                score2 = 0
-                for enemy in enemy_ninja_group:
-                    enemy.kill()
-                for punch in punch_group:
-                    punch.kill()
-                for hit in hit_group:
-                    hit.kill()
-                level1_done = False
-                level2_done = False
-                level_done = False
-                ninja, healthbar = world.process_data(world_data)
-                x = 0
-                ninja.alive == True
+        screen.fill((0, 0, 0))
+        draw_text('Game Over!', font_big, WHITE, 220, 200)
+        draw_text('Press space to try again', font_big, WHITE, 150, 300)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    # Reset the game state
+                    ninja.alive = True
+                    ninja.health = 100  # Reset ninja health
+                    score2 = 0
+                    phaseNum = 0
+                    x = 0
+                    level1_done = False
+                    level2_done = False
+                    level3_done = False
+                    level1_intro_done = False
+                    level2_intro_done = False
+                    level3_intro_done = False
+                    move_on = False
+                    reset_counter_2 = True
+                    reset_counter_3 = True
+                    counter = 10
+                    text = str(counter)
+                    getReadyText = 'Get Ready for Phase 1!'
+                    for enemy in enemy_ninja_group:
+                        enemy.kill()
+                    for p in punch_group:
+                        p.kill()
+                    for h in hit_group:
+                        h.kill()
+                    for e in hero_group:
+                        e.kill()
                 
 
     
