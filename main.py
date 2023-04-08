@@ -225,13 +225,14 @@ class Ninja(pygame.sprite.Sprite):
             self.action = new_action
 
     def punch(self):
-        if self.punch_cooldown == 0:
-            self.punch_cooldown = 50
-            self.punch_expire = 20
-            for pun in punch_group:
-                pun.kill()
-            punch = Punch(self.rect.centerx + (0.6*self.rect.size[0]*self.direction),self.rect.centery,self.direction)
-            punch_group.add(punch)
+        if self.char_type == 'ninja':
+            if self.punch_cooldown == 0:
+                self.punch_cooldown = 50
+                self.punch_expire = 20
+                for pun in punch_group:
+                    pun.kill()
+                punch = Punch(self.rect.centerx + (0.6*self.rect.size[0]*self.direction),self.rect.centery,self.direction)
+                punch_group.add(punch)
 
 
 
@@ -454,6 +455,7 @@ while run:
         enemy.ai()
         enemy.draw(screen)
         enemy.update()
+        print(str(enemy.health))
     star_group.draw(screen)
 
    #update and draw groups
@@ -468,6 +470,7 @@ while run:
         screen_scroll = ninja.move(moving_left,moving_right)
         bg_scroll -= screen_scroll
         if punch:
+                print("punch")
                 ninja.punch()
                 punch = False
     
