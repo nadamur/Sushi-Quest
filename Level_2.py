@@ -287,6 +287,11 @@ class Punch(pygame.sprite.Sprite):
         if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
             dx = 0
 
+        #check if going off the bottom of the screen
+        if self.rect.bottom + dy > SCREEN_HEIGHT:
+            dy = 0
+            self.alive = False
+
         #update rectangle position
         self.rect.x += dx
         self.rect.y += dy
