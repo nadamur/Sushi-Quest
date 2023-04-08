@@ -502,7 +502,8 @@ while run:
         if punch:
                 ninja.punch()
                 punch = False
-                
+
+    #check if player has reached the end of the level
         if level_complete ==True:
             run = False
 
