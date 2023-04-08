@@ -437,7 +437,7 @@ with open(f'level{level}_data.csv', newline='') as csvfile:
         for y, tile in enumerate(row):
             world_data[x][y] = int(tile)
 world = World()
-ninja, healthbar = world.process_data(world_data)            
+ninja, healthbar = world.process_data(world_data)
 star_img = pygame.image.load('Sprites/star.png').convert_alpha()
 
 run = True

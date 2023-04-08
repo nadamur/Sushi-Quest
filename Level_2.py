@@ -33,6 +33,7 @@ BLACK = (0, 0, 0)
 PANEL = (153, 217, 234)
 font_small = pygame.font.SysFont('Lucida Sans', 20)
 font_big = pygame.font.SysFont('Lucida Sans', 24)
+exit = False
 
 #loading the background
 viking_sea = pygame.image.load('assets/backgrounds/viking_sea_background.jpg')
@@ -552,8 +553,9 @@ reset_counter_3 = True
 
 def display_win_screen(screen, award_image, new_skill, WIN_WIDTH=640, WIN_HEIGHT=800):
     # Render the "You Win!" text
-    win_font = pygame.font.Font(None, 72)
-    win_text = win_font.render("You Win!", True, (255, 255, 255))
+    screen.fill(BLACK)
+    win_font = pygame.font.Font(None, 70)
+    win_text = win_font.render("You Win! Press Space to Advance", True, (255, 255, 255))
     win_text_rect = win_text.get_rect(center=(400, 300 - 100))
 
     # Load the award image and position it
@@ -721,16 +723,18 @@ while run:
             timer.start()
             level2_done = False
         if phaseNum == 4:
-            getReadyText = '     YOU DID IT!'
-            display_win_screen(screen,"Assets/Sushi/salmon+cucumber.png","Level up")
+            display_win_screen(screen,"Assets/Sushi/salmon+cucumber.png","Double Jump")
+            exit = True
+            hero_group.empty()
+
             
         level_done = check_level_done()
         if level_done == True:
             reset_enemies()
     else:
         screen.fill((0, 0, 0))
-        draw_text('Game Over!', font_big, WHITE, 220, 200)
-        draw_text('Press space to try again', font_big, WHITE, 150, 300)
+        draw_text('             Game Over!', font_big, WHITE, 220, 200)
+        draw_text('             Press space to try again', font_big, WHITE, 150, 300)
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -738,30 +742,27 @@ while run:
                 score2 = score1
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    score2 = score1
-                    phaseNum = 0
-                    x = 0
-                    level1_done = False
-                    level2_done = False
-                    level3_done = False
-                    reset_counter_2 = True
-                    reset_counter_3 = True
-                    counter = 5
-                    text = '3'
-                    getReadyText = 'Get Ready for Phase 1!'
-                    enemy_ninja_group.empty()
-                    punch_group.empty()
-                    hit_group.empty()
-                    hero_group.empty()
-                    pygame.time.set_timer(pygame.USEREVENT,1000)
-                    ninja, healthbar = world.process_data(world_data)
-                    hero_group.add(ninja)
-
-
-                
-
-    
-
+                    if exit == True:
+                        run = False
+                    else:
+                        score2 = score1
+                        phaseNum = 0
+                        x = 0
+                        level1_done = False
+                        level2_done = False
+                        level3_done = False
+                        reset_counter_2 = True
+                        reset_counter_3 = True
+                        counter = 5
+                        text = '3'
+                        getReadyText = 'Get Ready for Phase 1!'
+                        enemy_ninja_group.empty()
+                        punch_group.empty()
+                        hit_group.empty()
+                        hero_group.empty()
+                        pygame.time.set_timer(pygame.USEREVENT,1000)
+                        ninja, healthbar = world.process_data(world_data)
+                        hero_group.add(ninja)
     pygame.display.update()
     #render
 
