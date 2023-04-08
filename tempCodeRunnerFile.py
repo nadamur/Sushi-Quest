@@ -1,2 +1,2 @@
 
-            if ninja.alive:  
+# UI functions

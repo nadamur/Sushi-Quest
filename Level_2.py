@@ -753,16 +753,12 @@ while run:
                     counter = 10
                     text = str(counter)
                     getReadyText = 'Get Ready for Phase 1!'
-                    for enemy in enemy_ninja_group:
-                        enemy.kill()
-                    for p in punch_group:
-                        p.kill()
-                    for h in hit_group:
-                        h.kill()
-                    for e in hero_group:
-                        e.kill()
-                    for hero in hero_group:
-                        hero.kill()
+                    enemy_ninja_group.empty()
+                    punch_group.empty()
+                    hit_group.empty()
+                    hero_group.empty()
+
+
                 
 
     
