@@ -105,7 +105,7 @@ class Ninja(pygame.sprite.Sprite):
 
         #jumping
         if self.jump == True and self.jump_counter < 1:
-            self.vel_y = -14
+            self.vel_y = -16
             self.jump = False
             self.jump_counter +=1
 
@@ -343,6 +343,7 @@ class World():
                         ninja = Ninja('ninja', x * TILE_SIZE, y * TILE_SIZE, 15, 7)
                         healthbar = GameObjects.HealthBar(20,20,ninja.health,ninja.health)
                     elif tile == 16: # create enemy
+                        self.obstacle_list.append(tile_data)
                         enemy = EnemyNinja(x * TILE_SIZE, y * TILE_SIZE, 15,7)
                         enemy_ninja_group.add(enemy)
                     
