@@ -486,6 +486,7 @@ while run:
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            score = 0
             run = False
         #keyboard press
         if event.type == pygame.KEYDOWN:
