@@ -194,16 +194,18 @@ class Hit(pygame.sprite.Sprite):
         self.hitting = False
         self.flip = False
         self.direction = direction
-        self.animation_cooldown = 5
+        self.animation_cooldown = 10
         
     def draw (self):
         screen.blit(pygame.transform.flip(self.image,self.flip,False),self.rect)
     def update(self):
         if self.animation_cooldown > 0:
             self.animation_cooldown -= 1
+        if self.animation_cooldown == 0:
+            self.kill()
         if pygame.sprite.spritecollide(ninja,hit_group,False):
             if ninja.alive:  
-                if self.animation_cooldown == 0:
+                if self.animation_cooldown >= 9:
                     self.kill()
                     ninja.health -= 5
                     
@@ -218,6 +220,7 @@ class Punch(pygame.sprite.Sprite):
         self.flip = False
         self.dead = False
         self.animation_cooldown = 30
+        self.jump_counter = 0
         img = pygame.image.load('Sprites/hero_punch.png')
         img = pygame.transform.scale(img, (img.get_width() / 15, img.get_height()/15))
         self.image = img
@@ -287,11 +290,6 @@ class Punch(pygame.sprite.Sprite):
         if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
             dx = 0
 
-        #check if going off the bottom of the screen
-        if self.rect.bottom + dy > SCREEN_HEIGHT:
-            dy = 0
-            self.alive = False
-
         #update rectangle position
         self.rect.x += dx
         self.rect.y += dy
@@ -309,6 +307,7 @@ class Viking(pygame.sprite.Sprite):
         self.frame_index = 0
         self.scale = scale
         self.action = 0
+        self.dead_counter = 30
         self.health = 10
         self.max_health = self.health
         self.jump_counter = 0
@@ -328,9 +327,13 @@ class Viking(pygame.sprite.Sprite):
         self.rect.center = (x, y)
 
     def update(self):
+        if self.alive == False:
+            self.dead_counter -= 1
         self.dead()
         if self.hit_cooldowon > 0:
             self.hit_cooldowon -=1
+        if self.dead_counter == 0:
+            self.image = pygame.image.load('Sprites/transparent_image.png')
         
     def dead(self):
         if self.health <=0:
@@ -719,8 +722,8 @@ while run:
             timer.start()
             level2_done = False
         if phaseNum == 4:
-            # getReadyText = '     YOU DID IT!'
-            display_win_screen(screen,"Assets/Sushi/salmon+cucumber.png","Super Jump!")
+            getReadyText = '     YOU DID IT!'
+            display_win_screen(screen,"Assets/Sushi/salmon+cucumber.png","Level up")
             
         level_done = check_level_done()
         if level_done == True:
