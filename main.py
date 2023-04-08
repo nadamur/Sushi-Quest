@@ -32,6 +32,7 @@ score_increment = 0.05
 color = selected_color
 fontScore = pygame.font.SysFont('Condolas',35)
 
+
 #loading the background
 ninja_forest = pygame.image.load('assets/backgrounds/ninja_forest_background.png')
 original_width, original_height = ninja_forest.get_size()
@@ -170,6 +171,11 @@ class Ninja(pygame.sprite.Sprite):
             if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
                 dx = 0
         
+        level_complete = False
+        if self.char_type == 'ninja':
+        #checking for collision with exit
+            if pygame.sprite.spritecollide(self, exit_group, False):
+                level_complete = True
 
         #update rectangle position
         self.rect.x += dx
@@ -182,7 +188,7 @@ class Ninja(pygame.sprite.Sprite):
                 self.rect.x -= dx
                 screen_scroll = -dx
 
-        return screen_scroll
+        return screen_scroll, level_complete
     
     def throw(self):
         if self.throw_cooldown == 0:
@@ -249,7 +255,15 @@ class Ninja(pygame.sprite.Sprite):
                 punch_group.add(punch)
 
 
+class Exit(pygame.sprite.Sprite):
+	def __init__(self, img, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = img
+		self.rect = self.image.get_rect()
+		self.rect.midtop = (x + TILE_SIZE // 2, y + (TILE_SIZE - self.image.get_height()))
 
+	def update(self):
+		self.rect.x += screen_scroll
 
 class Star(pygame.sprite.Sprite):
     def __init__(self, x, y, direction):
@@ -385,6 +399,9 @@ class World():
                         # self.obstacle_list.append(tile_data)
                         enemy = Ninja('enemy',x * TILE_SIZE, y * TILE_SIZE, 15,7)
                         enemy_ninja_group.add(enemy)
+                    elif tile == 20: #create exit to the stage
+                        exit = Exit(img,x * TILE_SIZE, y * TILE_SIZE)
+                        exit_group.add(exit)
                     
         return ninja, healthbar
 
@@ -418,7 +435,7 @@ def draw_bg():
 enemy_ninja_group = pygame.sprite.Group()
 star_group = pygame.sprite.Group()
 punch_group = pygame.sprite.Group()
-
+exit_group = pygame.sprite.Group()
 
 
 
@@ -474,16 +491,21 @@ while run:
     star_group.update()
     star_group.draw(screen)
     
+    exit_group.update()
+    exit_group.draw(screen)
 
     
         
     if ninja.alive:
-        screen_scroll = ninja.move(moving_left,moving_right)
+        screen_scroll,level_complete = ninja.move(moving_left,moving_right)
         bg_scroll -= screen_scroll
         if punch:
                 ninja.punch()
                 punch = False
-    
+                
+        if level_complete ==True:
+            run = False
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
