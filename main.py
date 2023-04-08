@@ -53,6 +53,9 @@ class Ninja(pygame.sprite.Sprite):
         self.flip = False
         self.frame_index = 0
         self.action = 0
+        self.punching = False
+        self.punch_cooldown = 0
+        self.punch_expire = 0
         self.health = 100
         self.max_health = self.health
         self.jump_counter = 0
@@ -91,6 +94,13 @@ class Ninja(pygame.sprite.Sprite):
         self.dead()
         if self.throw_cooldown > 0:
             self.throw_cooldown -=1
+        if self.punch_expire > 0:
+            self.punch_expire -=1
+        if self.punch_cooldown > 0:
+            self.punch_cooldown -=1
+        if self.punch_expire ==0:
+            for pun in punch_group:
+                pun.kill()
 
     def move(self, moving_left,moving_right):
         screen_scroll = 0
@@ -214,6 +224,15 @@ class Ninja(pygame.sprite.Sprite):
         if new_action != self.action:
             self.action = new_action
 
+    def punch(self):
+        if self.punch_cooldown == 0:
+            self.punch_cooldown = 50
+            self.punch_expire = 20
+            for pun in punch_group:
+                pun.kill()
+            punch = Punch(self.rect.centerx + (0.6*self.rect.size[0]*self.direction),self.rect.centery,self.direction)
+            punch_group.add(punch)
+
 
 
 
@@ -240,6 +259,91 @@ class Star(pygame.sprite.Sprite):
                 ninja.health -= 5
                 self.kill()
                 print(ninja.health)
+
+class Punch(pygame.sprite.Sprite):
+    def __init__(self,x,y,direction):
+        pygame.sprite.Sprite.__init__(self)
+        self.speed = 7
+        self.direction = direction
+        self.vel_y = 0
+        self.jump = False
+        self.scale = 15
+        self.flip = False
+        self.dead = False
+        self.animation_cooldown = 30
+        self.jump_counter = 0
+        img = pygame.image.load('Sprites/hero_punch.png')
+        img = pygame.transform.scale(img, (img.get_width() / 15, img.get_height()/15))
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.rect.center = (x,y)
+
+    def draw(self):
+        screen.blit(pygame.transform.flip(self.image,self.flip,False),self.rect)
+    def update(self):
+        if self.animation_cooldown > 0:
+            self.animation_cooldown -= 1
+        for enemy in enemy_ninja_group:
+            if pygame.sprite.spritecollide(enemy, punch_group,False):
+                if self.dead == False:
+                    if enemy.alive:
+                        enemy.health -= 10
+                        self.dead = True
+                if self.animation_cooldown == 0:
+                    self.kill()
+                
+                
+                    
+    def move(self, moving_left,moving_right):
+        screen_scroll = 0
+        dx = 0
+        dy = 0
+
+        if moving_left:
+            dx = -self.speed
+            self.flip = True
+            self.direction = -.75
+        if moving_right:
+            dx = self.speed
+            self.flip = False
+            self.direction = 0.75
+
+        #jumping
+        if self.jump == True and self.jump_counter < 1:
+            self.vel_y = -14
+            self.jump = False
+            self.jump_counter +=1
+
+        #gravity
+        self.vel_y += 0.75
+        if self.vel_y>10:
+            self.vel_y
+        dy += self.vel_y
+
+        #collision check
+        for tile in world.obstacle_list:
+            #check collision in x direction
+            if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.rect.width, self.rect.height):
+                dx = 0
+            #check collision in y direction
+            if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.rect.width, self.rect.height):
+                #check if below the ground i.e. jumping
+                if self.vel_y < 0:
+                    dy = tile[1].bottom - self.rect.top
+                    self.vel_y = 0
+                #check if above the ground i.e. falling
+                elif self.vel_y >= 0:
+                    dy = tile[1].top - self.rect.bottom
+                    self.vel_y = 0
+                    self.jump_counter = 0
+
+        #check if going off the edges of the screen
+        if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
+            dx = 0
+
+        #update rectangle position
+        self.rect.x += dx
+        self.rect.y += dy
 
 #creating the world
 class World():
@@ -283,6 +387,7 @@ clock = pygame.time.Clock()
 FPS = 60
 moving_left = False
 moving_right = False
+punch = False
 BG = (144,201,100)
 red = (255,0,0)
 
@@ -296,6 +401,7 @@ def draw_bg():
 
 enemy_ninja_group = pygame.sprite.Group()
 star_group = pygame.sprite.Group()
+punch_group = pygame.sprite.Group()
 
 
 
@@ -353,10 +459,17 @@ while run:
    #update and draw groups
     star_group.update()
     star_group.draw(screen)
+    for p in punch_group:
+            p.move(moving_left,moving_right)
+            p.draw()
+            p.update()
         
     if ninja.alive:
         screen_scroll = ninja.move(moving_left,moving_right)
         bg_scroll -= screen_scroll
+        if punch:
+                ninja.punch()
+                punch = False
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -369,30 +482,34 @@ while run:
                 moving_right= True
             if event.key == pygame.K_UP and ninja.alive:
                 ninja.jump = True
-            if event.key == pygame.K_p:
-                # Play punch sound effect
-                #punch_sound.play()
+                for p in punch_group:
+                        p.jump = True
+            if event.key == pygame.K_SPACE:
+                    punch = True
+            # if event.key == pygame.K_p:
+                # # Play punch sound effect
+                # #punch_sound.play()
 
-                # Calculate the distance between the hero and the enemy closest to the hero using pythagoras theorem and find_closest_enemy function
-                distance = math.sqrt((ninja.rect.x - find_closest_enemy(ninja).rect.x)**2 + (ninja.rect.y - find_closest_enemy(ninja).rect.y)**2)
+                # # Calculate the distance between the hero and the enemy closest to the hero using pythagoras theorem and find_closest_enemy function
+                # distance = math.sqrt((ninja.rect.x - find_closest_enemy(ninja).rect.x)**2 + (ninja.rect.y - find_closest_enemy(ninja).rect.y)**2)
 
-                # If the distance is less than 200 pixels, the enemy is close enough to punch
-                if distance < 80:
-                    # Punch the enemy
-                    find_closest_enemy(ninja).health -= 10
+                # # If the distance is less than 200 pixels, the enemy is close enough to punch
+                # if distance < 80:
+                #     # Punch the enemy
+                #     find_closest_enemy(ninja).health -= 10
 
-                    # If the enemy's health is less than or equal to 0, kill the enemy
-                    if find_closest_enemy(ninja).health <= 0:
-                        find_closest_enemy(ninja).alive = False
-                        find_closest_enemy(ninja).kill()
+                #     # If the enemy's health is less than or equal to 0, kill the enemy
+                #     if find_closest_enemy(ninja).health <= 0:
+                #         find_closest_enemy(ninja).alive = False
+                #         find_closest_enemy(ninja).kill()
 
-                    # Draw the punch sprite to last for 0.5s but 10x smaller (Sprites/hero_punch.png) at the enemies's position
-                    punch_sprite = pygame.image.load('Sprites/hero_punch.png')
-                    punch_sprite = pygame.transform.scale(punch_sprite, (int(punch_sprite.get_width()/10), int(punch_sprite.get_height()/10)))
-                    #make the punch sprite appear at the enemy's position for 0.5s
-                    screen.blit(punch_sprite, (find_closest_enemy(ninja).rect.x, find_closest_enemy(ninja).rect.y))
-                    pygame.display.update()
-                    pygame.time.delay(500)
+                #     # Draw the punch sprite to last for 0.5s but 10x smaller (Sprites/hero_punch.png) at the enemies's position
+                #     punch_sprite = pygame.image.load('Sprites/hero_punch.png')
+                #     punch_sprite = pygame.transform.scale(punch_sprite, (int(punch_sprite.get_width()/10), int(punch_sprite.get_height()/10)))
+                #     #make the punch sprite appear at the enemy's position for 0.5s
+                #     screen.blit(punch_sprite, (find_closest_enemy(ninja).rect.x, find_closest_enemy(ninja).rect.y))
+                #     pygame.display.update()
+                #     pygame.time.delay(500)
             
         #keyboard release
         if event.type == pygame.KEYUP:
