@@ -4,6 +4,7 @@ import pygame, random, time, sys
 import GameObjects
 import csv
 import os
+from characterCustomization import selected_color
 
 # Creating the game objects 
 pygame.init()
@@ -68,7 +69,7 @@ class Ninja(pygame.sprite.Sprite):
         self.vision = pygame.Rect(0,0,150,20)
         self.animation_list = []
         if char_type == 'ninja':
-            img = pygame.image.load('Sprites/ninja_hero.png')
+            img = pygame.image.load(f'Assets/Ninja/ninja_hero_sprite_{selected_color}.png')
             img = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))
             self.animation_list.append(img)
             img = pygame.image.load('Sprites/dead_hero.png')

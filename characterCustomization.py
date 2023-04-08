@@ -217,7 +217,7 @@ def draw_characterCustomization(selected_color, input_text, name):
     label = font.render("Change the character's name:", True, WHITE)
     namePrinted = font.render(f"{name}", True, BLACK)
     WIN.blit(label, (SCREEN_WIDTH // 2 - label.get_width() // 2, 50))
-    WIN.blit(namePrinted, (SCREEN_WIDTH // 2 - namePrinted.get_width() // 2, 300))
+    WIN.blit(namePrinted, (SCREEN_WIDTH // 2 - namePrinted.get_width() // 2, 250))
     input_rect = input_box(input_text, SCREEN_WIDTH // 2 - 130 // 2, 130)
     font1 = pygame.font.Font("Fonts/COMIC.TTF", 17)
     label1 = font1.render("Press enter to save the name", True, WHITE)
