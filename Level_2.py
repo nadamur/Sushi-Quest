@@ -719,8 +719,8 @@ while run:
             timer.start()
             level2_done = False
         if phaseNum == 4:
-            getReadyText = '     YOU DID IT!'
-            display_win_screen(screen,"Assets/Sushi/salmon+cucumber.png","Level up")
+            # getReadyText = '     YOU DID IT!'
+            display_win_screen(screen,"Assets/Sushi/salmon+cucumber.png","Super Jump!")
             
         level_done = check_level_done()
         if level_done == True:
