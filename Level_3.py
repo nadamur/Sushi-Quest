@@ -74,6 +74,7 @@ class Ninja():
 		self.vel_y = 0
 		self.flip = False
 		self.jump = False
+		self.jump_counter = 0
 
 	def move(self):
 		#reset variables
@@ -90,9 +91,14 @@ class Ninja():
 			dx = 8
 			self.flip = False
 		if key[pygame.K_UP]:
-			if self.jump == False:
+			if self.jump_counter==0:
+				print(self.jump_counter)
 				self.vel_y = -20
-				self.jump = True
+				self.jump_counter += 1
+			elif self.jump_counter==1:
+				print(self.jump_counter)
+				self.vel_y = -20
+				self.jump_counter += 1
 			
 
 		#gravity
@@ -116,7 +122,7 @@ class Ninja():
 						self.rect.bottom = platform.rect.top
 						dy = 0
 						self.vel_y = 0
-						self.jump = False
+						self.jump_counter = 0
 						
         #check if the player has bounced to the top or bottom of the screen
 		if self.rect.top <= SCROLL_THRESH:

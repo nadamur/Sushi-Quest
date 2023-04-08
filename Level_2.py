@@ -105,6 +105,8 @@ class Ninja(pygame.sprite.Sprite):
             self.speed = 0
             self.alive = False
             self.update_action(1)
+        else:
+            self.update_action(0)
 
     def update_animation(self):
         self.image = self.animation_list[self.action]
@@ -737,9 +739,6 @@ while run:
                     level1_done = False
                     level2_done = False
                     level3_done = False
-                    level1_intro_done = False
-                    level2_intro_done = False
-                    level3_intro_done = False
                     move_on = False
                     reset_counter_2 = True
                     reset_counter_3 = True
