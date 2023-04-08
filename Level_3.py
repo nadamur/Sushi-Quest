@@ -2,7 +2,9 @@
 import pygame
 import random
 import os
-from Level_2 import score2
+
+with open("Level_2.py") as f:
+    exec(f.read())
 
 #initialise pygame
 pygame.init()
@@ -42,7 +44,7 @@ PANEL = (153, 217, 234)
 font_big = pygame.font.SysFont('Comic Sans', 24)
 
 #load images
-ninja_image = pygame.image.load('Assets/Sprites/ninja_hero_sprite.png').convert_alpha()
+ninja_image = pygame.image.load(f'Assets/Ninja/ninja_hero_sprite_{selected_color}.png').convert_alpha()
 bg_image = pygame.image.load('Assets/Backgrounds/jungle_forest_background.jpg').convert_alpha()
 platform_image = pygame.image.load('Assets/Sprites/wood.png').convert_alpha()
 
@@ -68,7 +70,7 @@ def draw_bg(bg_scroll):
 #player class
 class Ninja():
 	def __init__(self, x, y):
-		self.image = pygame.transform.scale(ninja_image, (45, 45))
+		self.image = pygame.transform.scale(ninja_image, (ninja_image.get_width() / 18, ninja_image.get_height()/18))
 		self.width = 25
 		self.height = 40
 		self.rect = pygame.Rect(0, 0, self.width, self.height-10)
@@ -299,6 +301,7 @@ while run:
 				#reset variables
 				game_over = False
 				scroll = 0
+				score3 = score2
 				fade_counter = 0
 				#reposition ninja
 				ninja.rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT - 150)

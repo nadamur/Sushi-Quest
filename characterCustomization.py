@@ -273,6 +273,8 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    run = False
                 if event.key == pygame.K_LEFT:
                     selected_color = list(ninja_sprites.keys())[list(ninja_sprites.keys()).index(selected_color) - 1]
                 if event.key == pygame.K_RIGHT:

@@ -6,6 +6,12 @@ import csv
 import os
 from characterCustomization import selected_color
 
+
+
+with open("characterCustomization.py") as f:
+    exec(f.read())
+
+
 # Creating the game objects 
 pygame.init()
 
@@ -23,6 +29,7 @@ screen_scroll = 0
 bg_scroll = 0
 score = 0
 score_increment = 0.05
+color = selected_color
 fontScore = pygame.font.SysFont('Condolas',35)
 
 #loading the background

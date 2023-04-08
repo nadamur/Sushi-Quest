@@ -4,7 +4,11 @@ import GameObjects
 import csv
 import os
 import threading
-from main import score1
+# from main import score1,selected_color
+
+with open("main.py") as f:
+    exec(f.read())
+
 
 # Creating the game objects 
 pygame.init()
@@ -69,7 +73,7 @@ class Ninja(pygame.sprite.Sprite):
         self.punch_cooldown = 0
         self.punch_expire = 0
         self.animation_list = []
-        img = pygame.image.load('Sprites/ninja_hero.png')
+        img = pygame.image.load(f'Assets/Ninja/ninja_hero_sprite_{color}.png')
         img = pygame.transform.scale(img, (img.get_width() / scale, img.get_height()/scale))
         self.animation_list.append(img)
         img = pygame.image.load('Sprites/dead_hero.png')
@@ -733,9 +737,6 @@ while run:
                 run = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    # Reset the game state
-                    # ninja.alive = True
-                    # ninja.health = 100  # Reset ninja health
                     score2 = score1
                     phaseNum = 0
                     x = 0
