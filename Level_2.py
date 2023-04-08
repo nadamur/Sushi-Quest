@@ -150,6 +150,9 @@ class Ninja(pygame.sprite.Sprite):
             self.vel_y
         dy += self.vel_y
 
+        if self.rect.bottom > SCREEN_HEIGHT:
+            self.health = 0
+            
         #collision check
         for tile in world.obstacle_list:
             #check collision in x direction
@@ -477,15 +480,6 @@ enemy_ninja_group = pygame.sprite.Group()
 punch_group = pygame.sprite.Group()
 hit_group = pygame.sprite.Group()
 
-star_group = pygame.sprite.Group()
-
-
-# Game functions
-def star_hit(self):
-    if ninja.alive:
-        ninja.health -= 5
-        self.kill()
-
 def createEnemy():
     x = random.randint(150,650)
     enemy = Viking(x, 350, 2.5,3)
@@ -740,24 +734,26 @@ while run:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     # Reset the game state
-                    ninja.alive = True
-                    ninja.health = 100  # Reset ninja health
-                    score2 = 0
+                    # ninja.alive = True
+                    # ninja.health = 100  # Reset ninja health
+                    score2 = score1
                     phaseNum = 0
                     x = 0
                     level1_done = False
                     level2_done = False
                     level3_done = False
-                    move_on = False
                     reset_counter_2 = True
                     reset_counter_3 = True
-                    counter = 10
-                    text = str(counter)
+                    counter = 5
+                    text = '3'
                     getReadyText = 'Get Ready for Phase 1!'
                     enemy_ninja_group.empty()
                     punch_group.empty()
                     hit_group.empty()
                     hero_group.empty()
+                    pygame.time.set_timer(pygame.USEREVENT,1000)
+                    ninja, healthbar = world.process_data(world_data)
+                    hero_group.add(ninja)
 
 
                 

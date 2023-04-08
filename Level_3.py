@@ -95,6 +95,8 @@ class Ninja():
 			self.jump_counter +=1
 			self.jump = False
 
+			
+
 
 
 		# for event in pygame.event.get():
