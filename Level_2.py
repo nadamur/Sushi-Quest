@@ -83,7 +83,7 @@ class Ninja(pygame.sprite.Sprite):
         self.dead()
         if self.punch_expire > 0:
             self.punch_expire -=1
-        # self.update_animation()
+
         if self.punch_cooldown > 0:
             self.punch_cooldown -=1
         if self.punch_expire ==0:
