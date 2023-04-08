@@ -105,7 +105,7 @@ class Ninja(pygame.sprite.Sprite):
 
         #jumping
         if self.jump == True and self.jump_counter < 1:
-            self.vel_y = -14
+            self.vel_y = -16
             self.jump = False
             self.jump_counter +=1
 
