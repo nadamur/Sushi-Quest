@@ -532,6 +532,7 @@ world = World()
 ninja, healthbar = world.process_data(world_data)            
 counter, text = 5, '3'
 getReadyText = 'Get Ready for Phase 1!'
+instructionText = 'Press Space Bar to Punch!'
 pygame.time.set_timer(pygame.USEREVENT,1000)
 fontNum = pygame.font.SysFont('Consolas',100)
 fontText = pygame.font.SysFont('Consolas',50)
@@ -622,6 +623,9 @@ while run:
                 
         #game logic
         screen.blit(fontText.render(getReadyText,True,(0,0,0)),(100,100))
+        fontInstruction = pygame.font.SysFont(None, 30)
+        screen.blit(fontInstruction.render(instructionText, True, (0, 0, 0)), (300, 160))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -684,6 +688,7 @@ while run:
         if text == 'Start!':
             text = ''
             getReadyText = ''
+            instructionText = ''
         start = pygame.time.get_ticks()
 
         if level_done:
@@ -721,8 +726,8 @@ while run:
             timer.start()
             level2_done = False
         if phaseNum == 4:
-            getReadyText = '     YOU DID IT!'
-            display_win_screen(screen,"Assets/Sushi/salmon+cucumber.png","Level up")
+            # getReadyText = '     YOU DID IT!'
+            display_win_screen(screen,"Assets/Sushi/salmon+cucumber.png","Double Jump")
             
         level_done = check_level_done()
         if level_done == True:
@@ -735,6 +740,7 @@ while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+                score2 = score1
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     score2 = score1
@@ -748,6 +754,7 @@ while run:
                     counter = 5
                     text = '3'
                     getReadyText = 'Get Ready for Phase 1!'
+                    instructionText = 'Press space to start'
                     enemy_ninja_group.empty()
                     punch_group.empty()
                     hit_group.empty()
