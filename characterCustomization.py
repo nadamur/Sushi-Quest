@@ -211,12 +211,12 @@ def draw_characterCustomization(selected_color, input_text, name):
     WIN.blit(color_text, (SCREEN_WIDTH // 2 - color_text.get_width() // 2, 570))
     
     # Draw the ninja sprite
-    WIN.blit(ninja_sprites[selected_color], (SCREEN_WIDTH // 2 - ninja_sprites[selected_color].get_width() // 2, 295))
+    WIN.blit(ninja_sprites[selected_color], (SCREEN_WIDTH // 2 - ninja_sprites[selected_color].get_width() // 2, 330))
 
     # Draw the input box
     font = pygame.font.Font("Fonts/COMIC.TTF", 30)
     label = font.render("Change the character's name:", True, WHITE)
-    namePrinted = font.render(f"{name}", True, BLACK)
+    namePrinted = font.render(f"{input_text}", True, BLACK)
     WIN.blit(label, (SCREEN_WIDTH // 2 - label.get_width() // 2, 50))
     WIN.blit(namePrinted, (SCREEN_WIDTH // 2 - namePrinted.get_width() // 2, 250))
     input_rect = input_box(input_text, SCREEN_WIDTH // 2 - 130 // 2, 130)
