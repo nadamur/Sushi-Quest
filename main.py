@@ -32,7 +32,10 @@ score = [0]
 score_increment = 0.05
 color = selected_color
 fontScore = pygame.font.SysFont('Condolas',35)
-
+font_big = pygame.font.SysFont('Comic Sans',35)
+WHITE = (255,255,255)
+BLACK = (0,0,0)
+fade_counter = 0
 
 #loading the background
 ninja_forest = pygame.image.load('assets/backgrounds/ninja_forest_background.png')
@@ -47,6 +50,10 @@ for x in range(TILE_TYPES):
     img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
     img_list.append(img)
     
+#creating the text for the game over screen
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img, (x, y))
 
 #creating the player
 class Ninja(pygame.sprite.Sprite):
@@ -498,6 +505,40 @@ while run:
         if punch:
                 ninja.punch()
                 punch = False
+    else:
+        if fade_counter < SCREEN_WIDTH:
+            fade_counter += 5
+            for y in range(0, 6, 2):
+                pygame.draw.rect(screen, BLACK, (0, y * 100, fade_counter, 100))
+                pygame.draw.rect(screen, BLACK, (SCREEN_WIDTH - fade_counter, (y + 1) * 100, SCREEN_WIDTH, 100))
+        else:
+            sc = 0
+            screen.fill(BLACK)
+            draw_text('Game Over!', font_big, WHITE, 300, 200)
+            draw_text('Press R to try again', font_big, WHITE, 230, 300)
+
+
+            key = pygame.key.get_pressed()
+            enemy_ninja_group.empty()
+           
+            if key[pygame.K_r]:
+                run = True
+                fade_counter = 0
+                world_data = []
+                for row in range(rows1):
+                    r = [-1] * cols1
+                    world_data.append(r)
+
+
+                #load in level data and create world
+                with open(f'level{level}_data.csv', newline='') as csvfile:
+                    reader = csv.reader(csvfile, delimiter=',')
+                    for x, row in enumerate(reader):
+                        for y, tile in enumerate(row):
+                            world_data[x][y] = int(tile)
+                world = World()
+                ninja, healthbar = world.process_data(world_data)
+
 
     #check if player has reached the end of the level
         if level_complete ==True:
