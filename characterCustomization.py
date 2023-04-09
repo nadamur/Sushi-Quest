@@ -125,8 +125,9 @@ def draw_background_page(mouse_pos):
     intro_text = (
         "You are a skilled ninja on a mission to create the ultimate sushi, a revered work of art in this enchanted world. "
         "Armed with your lightning-fast reflexes, you must collect the sushi ingredients through combating various challenges. "
-        "Along the way, wise NPCs will offer hints and humor to aid you. Will you rise to the challenge and craft the ultimate sushi? "
-        "The journey begins now."
+        "Will you rise to the challenge and craft the ultimate sushi? The journey begins now! "
+        "Instructions: Use the left and right arrow keys to move the ninja and the up arrow key to jump. Use the spacebar to punch. "
+        "Throughout this journey, you will learn new skills and power-up!"
     )
     intro_lines = intro_text.split(" ")
     rendered_lines = []
