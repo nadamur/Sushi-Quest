@@ -502,6 +502,10 @@ while run:
     if ninja.alive:
         screen_scroll,level_complete = ninja.move(moving_left,moving_right)
         bg_scroll -= screen_scroll
+        #check if player has reached the end of the level
+        if level_complete == True:
+            display_win_screen(screen,"Assets/Sushi/rice+seaweed.png","Power Up Punching")
+            
         if punch:
                 ninja.punch()
                 punch = False
@@ -539,10 +543,6 @@ while run:
                 world = World()
                 ninja, healthbar = world.process_data(world_data)
 
-
-    #check if player has reached the end of the level
-        if level_complete ==True:
-            display_win_screen(screen,"Assets/Sushi/rice+seaweed.png","Power Up Punching")
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
