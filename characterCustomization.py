@@ -224,7 +224,7 @@ def draw_characterCustomization(selected_color, input_text, name):
     WIN.blit(namePrinted, (SCREEN_WIDTH // 2 - namePrinted.get_width() // 2, 250))
     input_rect = input_box(input_text, SCREEN_WIDTH // 2 - 130 // 2, 130)
     font1 = pygame.font.Font("Fonts/COMIC.TTF", 17)
-    label1 = font1.render("Press enter to save the name", True, WHITE)
+    label1 = font1.render("Press enter to save and start game", True, WHITE)
     WIN.blit(label1, (SCREEN_WIDTH // 2 - label1.get_width() // 2, 90))
 
     pygame.display.update()
@@ -270,6 +270,7 @@ def main():
     global selected_color
     customization_screen = True
     input_text = "Ninja"
+    name = "Ninja"
     active = True
     while customization_screen and run:
         input_rect = draw_characterCustomization(selected_color, input_text, name)
