@@ -2,6 +2,7 @@
 import pygame
 import random
 import os
+from characterCustomization import name
 
 with open("Level_2.py") as f:
     exec(f.read())
@@ -230,13 +231,13 @@ last_platform_y -= random.randint(80, 120)
 last_platform = Platform(0, last_platform_y, SCREEN_WIDTH, False)
 platform_group.add(last_platform)
 
-def display_win_screen(screen, award_image, score, WIN_WIDTH=600, WIN_HEIGHT=600):
+def display_win_screen(screen, award_image, score, name, WIN_WIDTH=600, WIN_HEIGHT=600):
     # Load the image
     start_background = pygame.image.load("Assets/Backgrounds/start_background.png")
 
     # Render the "You Win!" text
     win_font = pygame.font.Font(None, 48)
-    win_text = win_font.render("You win the ultimate sushi!", True, (255, 255, 255))
+    win_text = win_font.render(f"{name}, You win the ultimate sushi!", True, (255, 255, 255))
     win_text_rect = win_text.get_rect(center=(300, 300 - 200))
 
     # Load the award image and position it
@@ -293,7 +294,7 @@ while run:
 		#check if ninja has past the last platform
 		if ninja.rect.bottom < platform_group.sprites()[-1].rect.top:
 			# game_over = True
-			display_win_screen(screen,"Assets/Sushi/sushi.png",s)
+			display_win_screen(screen,"Assets/Sushi/sushi.png",s,name)
 
 		if ninja.rect.top > SCREEN_HEIGHT:
 			game_over = True
@@ -305,6 +306,7 @@ while run:
 				pygame.draw.rect(screen, BLACK, (0, y * 100, fade_counter, 100))
 				pygame.draw.rect(screen, BLACK, (SCREEN_WIDTH - fade_counter, (y + 1) * 100, SCREEN_WIDTH, 100))
 		else:
+			display_win_screen(screen,"Assets/Sushi/sushi.png",s,name)
 			draw_text('Game Over!', font_big, WHITE, 220, 200)
 			draw_text('    Press R to try again', font_big, WHITE, 150, 300)
 

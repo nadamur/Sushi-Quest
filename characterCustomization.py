@@ -166,6 +166,8 @@ def draw_background_page(mouse_pos):
 
 # ----------------------- Character customization screen ------------------------- 
 
+name = "Ninja"
+
 # Load and resize ninja images
 NINJA_COLORS = {
     "blue": "Assets/Ninja/ninja_hero_sprite_blue.png",
@@ -174,6 +176,7 @@ NINJA_COLORS = {
     "pink": "Assets/Ninja/ninja_hero_sprite_pink.png",
     "purple": "Assets/Ninja/ninja_hero_sprite_purple.png",
     "red": "Assets/Ninja/ninja_hero_sprite_red.png",
+    "yellow": "Assets/Ninja/ninja_hero_sprite_yellow.png",
 }
 SCALE_FACTOR = 0.3  # Change this value to adjust the size of the ninja sprite
 ninja_sprites = {
@@ -226,6 +229,7 @@ def draw_characterCustomization(selected_color, input_text, name):
 
     pygame.display.update()
     return input_rect
+
     
 
 
@@ -266,7 +270,6 @@ def main():
     global selected_color
     customization_screen = True
     input_text = "Ninja"
-    name = "Ninja"
     active = True
     while customization_screen and run:
         input_rect = draw_characterCustomization(selected_color, input_text, name)
