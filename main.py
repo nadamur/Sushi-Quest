@@ -529,6 +529,7 @@ while run:
             if key[pygame.K_r]:
                 run = True
                 fade_counter = 0
+                score[0] = 0
                 world_data = []
                 for row in range(rows1):
                     r = [-1] * cols1
