@@ -306,7 +306,6 @@ while run:
 				pygame.draw.rect(screen, BLACK, (0, y * 100, fade_counter, 100))
 				pygame.draw.rect(screen, BLACK, (SCREEN_WIDTH - fade_counter, (y + 1) * 100, SCREEN_WIDTH, 100))
 		else:
-			display_win_screen(screen,"Assets/Sushi/sushi.png",s,name)
 			draw_text('Game Over!', font_big, WHITE, 220, 200)
 			draw_text('    Press R to try again', font_big, WHITE, 150, 300)
 

@@ -6,7 +6,7 @@ import os
 import threading
 # from main import score1,selected_color
 
-with open("main.py") as f:
+with open("Level_1.py") as f:
     exec(f.read())
 
 
