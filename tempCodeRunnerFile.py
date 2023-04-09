@@ -1,3 +1,2 @@
 
-# with open("characterCustomization.py") as f:
-#     exec(f.read())
+            self.rect.x = ninja.rect.x + 25

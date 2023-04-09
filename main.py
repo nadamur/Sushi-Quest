@@ -27,7 +27,7 @@ cols1 = 150
 SCROLL_THRESH = 200
 screen_scroll = 0
 bg_scroll = 0
-score = 0
+score = [0]
 score_increment = 0.05
 color = selected_color
 fontScore = pygame.font.SysFont('Condolas',35)
@@ -104,6 +104,7 @@ class Ninja(pygame.sprite.Sprite):
             if self.alive == False:
                 self.dead_counter -= 1
             if self.dead_counter == 0:
+                score[0] -= 20
                 self.kill()
         self.update_animation()
         self.dead()
@@ -298,6 +299,7 @@ class Punch(pygame.sprite.Sprite):
         self.scale = 15
         self.flip = False
         self.dead = False
+        self.moved = False
         self.animation_cooldown = 30
         self.jump_counter = 0
         img = pygame.image.load('Sprites/hero_punch.png')
@@ -325,55 +327,70 @@ class Punch(pygame.sprite.Sprite):
                 
                     
     def move(self, moving_left,moving_right):
-        screen_scroll = 0
-        dx = 0
-        dy = 0
+        if ninja.direction ==1:
+            if self.moved == False:
+                self.flip = True
+            self.moved = True
+            self.rect.x = ninja.rect.x + 20
+        elif ninja.direction == -1:
+            if self.moved == False:
+               self.flip = False 
+            self.rect.x = ninja.rect.x -20
+            self.moved = True
+            
+        
+        self.rect.y = ninja.rect.y+10
+        
 
-        if moving_left:
-            dx = -self.speed
-            self.flip = True
-            self.direction = -.75
-        if moving_right:
-            dx = self.speed
-            self.flip = False
-            self.direction = 0.75
+        # screen_scroll = 0
+        # dx = 0
+        # dy = 0
 
-        #jumping
-        if self.jump == True and self.jump_counter < 1:
-            self.vel_y = -14
-            self.jump = False
-            self.jump_counter +=1
+        # if moving_left:
+        #     dx = -self.speed
+        #     self.flip = True
+        #     self.direction = -.75
+        # if moving_right:
+        #     dx = self.speed
+        #     self.flip = False
+        #     self.direction = 0.75
 
-        #gravity
-        self.vel_y += 0.75
-        if self.vel_y>10:
-            self.vel_y
-        dy += self.vel_y
+        # #jumping
+        # if self.jump == True and self.jump_counter < 1:
+        #     self.vel_y = -14
+        #     self.jump = False
+        #     self.jump_counter +=1
 
-        #collision check
-        for tile in world.obstacle_list:
-            #check collision in x direction
-            if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.rect.width, self.rect.height):
-                dx = 0
-            #check collision in y direction
-            if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.rect.width, self.rect.height):
-                #check if below the ground i.e. jumping
-                if self.vel_y < 0:
-                    dy = tile[1].bottom - self.rect.top
-                    self.vel_y = 0
-                #check if above the ground i.e. falling
-                elif self.vel_y >= 0:
-                    dy = tile[1].top - self.rect.bottom
-                    self.vel_y = 0
-                    self.jump_counter = 0
+        # #gravity
+        # self.vel_y += 0.75
+        # if self.vel_y>10:
+        #     self.vel_y
+        # dy += self.vel_y
 
-        #check if going off the edges of the screen
-        if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
-            dx = 0
+        # #collision check
+        # for tile in world.obstacle_list:
+        #     #check collision in x direction
+        #     # if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.rect.width, self.rect.height):
+        #     #     dx = 0
+        #     #check collision in y direction
+        #     if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.rect.width, self.rect.height):
+        #         #check if below the ground i.e. jumping
+        #         if self.vel_y < 0:
+        #             dy = tile[1].bottom - self.rect.top
+        #             self.vel_y = 0
+        #         #check if above the ground i.e. falling
+        #         elif self.vel_y >= 0:
+        #             dy = tile[1].top - self.rect.bottom
+        #             self.vel_y = 0
+        #             self.jump_counter = 0
 
-        #update rectangle position
-        self.rect.x += dx
-        self.rect.y += dy
+        # #check if going off the edges of the screen
+        # if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
+        #     dx = 0
+
+        # #update rectangle position
+        # self.rect.x += dx
+        # self.rect.y += dy
 
 #creating the world
 class World():
@@ -464,11 +481,11 @@ while run:
     clock.tick(FPS)
     draw_bg()
     world.draw()
-    sc = round(score)
+    sc = round(score[0])
     s = str(sc)
     screen.blit(fontScore.render("Score: " + s,True,(255,0,0)),(20,50))
     if ninja.alive:
-        score += score_increment
+        score[0] += score_increment
     ninja.draw(screen)
     for enemy in enemy_ninja_group:
         enemy.draw(screen)
@@ -509,7 +526,7 @@ while run:
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            score = 0
+            score[0] = 0
             run = False
         #keyboard press
         if event.type == pygame.KEYDOWN:
@@ -530,7 +547,7 @@ while run:
                moving_left = False
            if event.key == pygame.K_RIGHT:
                moving_right= False       
-    score1 = score
+    score1 = score[0]
     
     
 
