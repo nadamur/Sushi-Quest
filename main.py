@@ -27,6 +27,7 @@ cols1 = 150
 SCROLL_THRESH = 200
 screen_scroll = 0
 bg_scroll = 0
+BLACK = (0, 0, 0)
 score = [0]
 score_increment = 0.05
 color = selected_color
@@ -399,6 +400,7 @@ def draw_bg():
 
 def display_win_screen(screen, award_image, new_skill, WIN_WIDTH=640, WIN_HEIGHT=800):
     # Render the "You Win!" text
+    screen.fill(BLACK)
     win_font = pygame.font.Font(None, 72)
     win_text = win_font.render("You Win!", True, (255, 255, 255))
     win_text_rect = win_text.get_rect(center=(400, 300 - 100))
@@ -410,6 +412,7 @@ def display_win_screen(screen, award_image, new_skill, WIN_WIDTH=640, WIN_HEIGHT
     # Render the new skill text
     skill_font = pygame.font.Font(None, 48)
     skill_text = skill_font.render(f"New Skill: {new_skill}", True, (255, 255, 255))
+    
     skill_text_rect = skill_text.get_rect(center=(400, 300 + 100))
 
     # Draw everything on the screen
@@ -498,7 +501,7 @@ while run:
 
     #check if player has reached the end of the level
         if level_complete ==True:
-            run = False
+            display_win_screen(screen,"Assets/Sushi/rice+seaweed.png","Power Up Punching")
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
