@@ -525,11 +525,14 @@ while run:
 
             key = pygame.key.get_pressed()
             enemy_ninja_group.empty()
+            exit_group.empty()
            
             if key[pygame.K_r]:
                 run = True
                 fade_counter = 0
                 score[0] = 0
+                screen_scroll = 0
+                bg_scroll = 0
                 world_data = []
                 for row in range(rows1):
                     r = [-1] * cols1

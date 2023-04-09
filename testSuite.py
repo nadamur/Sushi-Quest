@@ -1,28 +1,44 @@
 #Here's a general test suite for the project. 
 #It's not complete, because there are a lot of things to test for our project for writing tests methods for.
-#We decided to run tests manually instead of writing a test suite code for the project.
+#We decided to run some tests manually instead of writing a test suite code for the project.
 
-# tests/test_player.py
-def test_player_initial_position():
-    # Test that the player starts at the correct position
-    pass
 
-def test_player_jump():
-    # Test that the player can jump properly
-    pass
+# tests/test_gameplay.py
 
 def test_player_collision():
     # Test that player collisions with other objects are handled correctly
-    pass
+    game = Game()
+    player = Player()
+    enemy = Enemy()
+    
+    # Test player collision with enemy
+    player.x = 100
+    player.y = 100
+    enemy.x = 100
+    enemy.y = 100
+    assert game.handle_collision(player, enemy) == "player_died"
 
-# tests/test_level.py
+
 def test_level_loading():
     # Test that levels are loaded correctly from files
-    pass
+    game = Game()
+    level_data = game.load_level("level1.txt")
+    assert level_data == {"enemies": [Enemy(x=100, y=100), Enemy(x=200, y=200)]}
+
 
 def test_level_enemies():
     # Test that enemies are placed and behave correctly in a level
-    pass
+    game = Game()
+    level_data = {"enemies": [Enemy(x=100, y=100), Enemy(x=200, y=200)], "power_ups": [PowerUp(x=300, y=300)]}
+    game.load_level_data(level_data)
+    
+    # Test enemy placement
+    assert game.enemies == [Enemy(x=100, y=100), Enemy(x=200, y=200)]
+    
+    # Test enemy behavior
+    game.update()
+    assert game.enemies[0].x == 90
+    assert game.enemies[1].y == 190
 
 # tests/test_enemies.py
 def test_enemy_movement():
