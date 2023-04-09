@@ -739,14 +739,14 @@ while run:
     else:
         screen.fill((0, 0, 0))
         draw_text('             Game Over!', font_big, WHITE, 220, 200)
-        draw_text('             Press space to try again', font_big, WHITE, 150, 300)
+        draw_text('                Press R to try again', font_big, WHITE, 150, 300)
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 score2 = score1
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_r:
                     if exit == True:
                         run = False
                     else:

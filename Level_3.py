@@ -283,6 +283,10 @@ while run:
 		platform_group.draw(screen)
 		enemy_group.draw(screen)
 		ninja.draw()
+		score3 += score_increment
+		sc = round(score3)
+		s = str(sc)
+		screen.blit(fontScore.render("Score: " + s,True,(255,0,0)),(10,10))
 		
 		
 
@@ -296,16 +300,17 @@ while run:
 
 	else:
 		if fade_counter < SCREEN_WIDTH:
-			fade_counter += 5
+			fade_counter += 10
 			for y in range(0, 6, 2):
 				pygame.draw.rect(screen, BLACK, (0, y * 100, fade_counter, 100))
 				pygame.draw.rect(screen, BLACK, (SCREEN_WIDTH - fade_counter, (y + 1) * 100, SCREEN_WIDTH, 100))
 		else:
 			draw_text('Game Over!', font_big, WHITE, 220, 200)
-			draw_text('Press space to try again', font_big, WHITE, 150, 300)
+			draw_text('    Press R to try again', font_big, WHITE, 150, 300)
+
 			#update high score
 			key = pygame.key.get_pressed()
-			if key[pygame.K_SPACE]:
+			if key[pygame.K_r]:
 				#reset variables
 				game_over = False
 				scroll = 0
@@ -351,10 +356,7 @@ while run:
 				moving_left = False
 			if event.key == pygame.K_RIGHT:
 				moving_right = False
-	score3 += score_increment
-	sc = round(score3)
-	s = str(sc)
-	screen.blit(fontScore.render("Score: " + s,True,(255,0,0)),(10,10))
+
 
 
 	#update display window
