@@ -59,7 +59,7 @@ class Ninja(pygame.sprite.Sprite):
         self.throw_cooldown = 0
         self.vel_y = 0
         self.jump = False
-        self.dead_counter = 20
+        self.dead_counter = 15
         self.flip = False
         self.frame_index = 0
         self.action = 0
@@ -341,57 +341,6 @@ class Punch(pygame.sprite.Sprite):
         
         self.rect.y = ninja.rect.y+10
         
-
-        # screen_scroll = 0
-        # dx = 0
-        # dy = 0
-
-        # if moving_left:
-        #     dx = -self.speed
-        #     self.flip = True
-        #     self.direction = -.75
-        # if moving_right:
-        #     dx = self.speed
-        #     self.flip = False
-        #     self.direction = 0.75
-
-        # #jumping
-        # if self.jump == True and self.jump_counter < 1:
-        #     self.vel_y = -14
-        #     self.jump = False
-        #     self.jump_counter +=1
-
-        # #gravity
-        # self.vel_y += 0.75
-        # if self.vel_y>10:
-        #     self.vel_y
-        # dy += self.vel_y
-
-        # #collision check
-        # for tile in world.obstacle_list:
-        #     #check collision in x direction
-        #     # if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.rect.width, self.rect.height):
-        #     #     dx = 0
-        #     #check collision in y direction
-        #     if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.rect.width, self.rect.height):
-        #         #check if below the ground i.e. jumping
-        #         if self.vel_y < 0:
-        #             dy = tile[1].bottom - self.rect.top
-        #             self.vel_y = 0
-        #         #check if above the ground i.e. falling
-        #         elif self.vel_y >= 0:
-        #             dy = tile[1].top - self.rect.bottom
-        #             self.vel_y = 0
-        #             self.jump_counter = 0
-
-        # #check if going off the edges of the screen
-        # if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
-        #     dx = 0
-
-        # #update rectangle position
-        # self.rect.x += dx
-        # self.rect.y += dy
-
 #creating the world
 class World():
     def __init__(self):
@@ -563,8 +512,6 @@ while run:
                 moving_right= True
             if event.key == pygame.K_UP and ninja.alive:
                 ninja.jump = True
-                for p in punch_group:
-                        p.jump = True
             if event.key == pygame.K_SPACE:
                     punch = True
             
