@@ -56,13 +56,6 @@ def draw_text(text, font, text_col, x, y):
 	img = font.render(text, True, text_col)
 	screen.blit(img, (x, y))
 
-# #function for drawing info panel
-# def draw_panel():
-# 	pygame.draw.rect(screen, PANEL, (0, 0, SCREEN_WIDTH, 30))
-# 	pygame.draw.line(screen, WHITE, (0, 30), (SCREEN_WIDTH, 30), 2)
-# 	draw_text('SCORE: ' + str(score), font_small, WHITE, 0, 0)
-
-
 #function for drawing the background
 def draw_bg(bg_scroll):
 	screen.blit(bg_image, (0, 0 + bg_scroll))
